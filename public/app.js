@@ -73,7 +73,7 @@ function modal(html) {
 $("#close-dialog").onclick = () => $("#dialog").close();
 $("#privacy").onclick = () =>
   modal(
-    `<h2>이용·개인정보 안내</h2><p>실명 대신 수업용 별명을 사용하세요. 교사 ID, 암호화된 비밀번호, 수업 자료, 글쓰기 기록, AI 피드백, 게시글과 댓글을 저장합니다. 학생 초안과 수정 기록은 해당 학생과 수업 교사에게만 제공하며, 주제와 완성 글은 학생이 공유할 때 같은 학급에 공개합니다.</p><p>AI 요청 시 읽기 자료, 관심 분야, 초안 또는 사진이 운영자가 설정한 AI 서비스(Cloudflare Workers AI 또는 OpenAI API)로 전송됩니다. API 요청에 응답 보관 비활성화를 설정했지만 제공사의 데이터 처리 정책도 적용됩니다. 사진 원본은 앱 서버에 저장하지 않으며, 선택한 사진은 화면을 떠나거나 새로고침하면 사라집니다.</p><p>교사는 수업 기록을 내려받고 수업을 삭제할 수 있습니다. 학교의 학생 개인정보 처리 안내에 따라 이용하세요. AI 피드백은 오류가 있을 수 있으므로 학생과 교사가 검토합니다. AI 기능은 운영자의 사용량 한도 내에서 제공됩니다.</p><p>학생 비밀번호를 잊으면 수업 교사에게 초기화를 요청하세요. 교사는 가입할 때 발급된 복구 코드로 비밀번호를 바꿀 수 있습니다. 자동 로그아웃은 로그인 후 7일입니다.</p>`,
+    `<h2>이용·개인정보 안내</h2><p>실명 대신 수업용 별명을 사용하세요. 교사 ID, 암호화된 비밀번호, 수업 자료, 글쓰기 기록, AI 피드백, 게시글과 댓글을 저장합니다. 학생 초안과 수정 기록은 해당 학생과 수업 교사에게만 제공하며, 주제와 완성 글은 학생이 공유할 때 같은 학급에 공개합니다.</p><p>AI 요청 시 읽기 자료, 관심 분야, 초안 또는 사진이 운영자가 설정한 AI 서비스(Cloudflare Workers AI 또는 로컬 버전의 Google Gemini API)로 전송됩니다. API 요청에 응답 보관 비활성화를 설정했지만 제공사의 데이터 처리 정책도 적용됩니다. 사진 원본은 앱 서버에 저장하지 않으며, 선택한 사진은 화면을 떠나거나 새로고침하면 사라집니다.</p><p>교사는 수업 기록을 내려받고 수업을 삭제할 수 있습니다. 학교의 학생 개인정보 처리 안내에 따라 이용하세요. AI 피드백은 오류가 있을 수 있으므로 학생과 교사가 검토합니다. AI 기능은 운영자의 사용량 한도 내에서 제공됩니다.</p><p>학생 비밀번호를 잊으면 수업 교사에게 초기화를 요청하세요. 교사는 가입할 때 발급된 복구 코드로 비밀번호를 바꿀 수 있습니다. 자동 로그아웃은 로그인 후 7일입니다.</p>`,
   );
 const materials = [
   {
@@ -121,7 +121,7 @@ function account() {
       });
 }
 function home() {
-  app.innerHTML = `<section class="hero"><div><span class="eyebrow">지역에서 발견하고 · 나의 생각으로 쓰다</span><h1>파주, 텍스트로 걷고<br>나의 길을 사유하다</h1><p>파주의 이야기를 읽고 나의 진로와 연결해 보세요.<br>AI의 질문을 따라 생각을 넓히고, 내 문장으로 완성하는<br>네 단계 에세이 수업입니다.</p><span class="tag">설치 없이, 주소 하나로 시작하는 수업</span></div><div class="hero-art" aria-hidden="true"><div class="paper-card"><span class="dot"></span><div class="line"></div><b>My question.<br>My words.</b><div class="line"></div><div class="line"></div></div><span class="hero-label">읽기에서 진로로, 질문에서 글로 ↗</span></div></section><section class="role-grid"><div class="card role-card"><span class="tag">STUDENT · 휴대폰 / 태블릿</span><h2>학생으로 참여하기</h2><p class="muted">선생님이 공유한 코드로 입장하고<br>나의 글쓰기 여정을 이어가세요.</p><button id="student-start">수업 참여하기 →</button></div><div class="card role-card"><span class="tag">TEACHER · 컴퓨터 권장</span><h2>교사로 수업 만들기</h2><p class="muted">공통 자료를 준비하고 수업 링크를 공유하세요.<br>학생의 생각이 자라는 과정을 한눈에 확인합니다.</p><button id="teacher-start" class="secondary">교사 작업실 열기 →</button></div></section><section class="steps-intro"><div><i>01</i><b>함께 읽기</b><span>파주 소재 또는 교사 키워드</span></div><div><i>02</i><b>질문 발견하기</b><span>진로에서 찾는 나만의 주제</span></div><div><i>03</i><b>직접 쓰고 고치기</b><span>초안 촬영과 질문 중심 피드백</span></div><div><i>04</i><b>글과 생각 나누기</b><span>완성 글, 댓글, 성찰</span></div></section>`;
+  app.innerHTML = `<section class="hero"><div><span class="eyebrow">지역에서 발견하고 · 나의 생각으로 쓰다</span><h1>파주, 텍스트로 걷고<br>나의 길을 사유하다</h1><p>파주의 이야기를 읽고 나의 진로와 연결해 보세요.<br>AI의 질문을 따라 생각을 넓히고, 내 문장으로 완성하는<br>네 단계 에세이 수업입니다.</p><span class="tag">설치 없이, 주소 하나로 시작하는 수업</span></div><div class="hero-art" aria-hidden="true"><div class="paper-card"><span class="dot"></span><div class="line"></div><b>My question.<br>My words.</b><div class="line"></div><div class="line"></div></div><span class="hero-label">읽기에서 진로로, 질문에서 글로 ↗</span></div></section><section class="role-grid"><div class="card role-card"><span class="tag">STUDENT · 휴대폰 / 태블릿</span><h2>학생으로 참여하기</h2><p class="muted">선생님이 공유한 코드로 입장하고<br>나의 글쓰기 여정을 이어가세요.</p><button id="student-start">수업 참여하기 →</button></div><div class="card role-card"><span class="tag">TEACHER · 컴퓨터 권장</span><h2>교사로 수업 만들기</h2><p class="muted">공통 자료를 준비하고 수업 링크를 공유하세요.<br>학생의 생각이 자라는 과정을 한눈에 확인합니다.</p><button id="teacher-start" class="secondary">교사 작업실 열기 →</button><a href="/local-guide.html">PC 설치 버전 · 학교 Google 계정 연결 ↗</a></div></section><section class="steps-intro"><div><i>01</i><b>함께 읽기</b><span>파주 소재 또는 교사 키워드</span></div><div><i>02</i><b>질문 발견하기</b><span>진로에서 찾는 나만의 주제</span></div><div><i>03</i><b>직접 쓰고 고치기</b><span>초안 촬영과 질문 중심 피드백</span></div><div><i>04</i><b>글과 생각 나누기</b><span>완성 글, 댓글, 성찰</span></div></section>`;
   $("#student-start").onclick = () => auth("student");
   $("#teacher-start").onclick = () => auth("teacher");
 }
@@ -477,8 +477,73 @@ function renderPosts(posts) {
     }),
   );
 }
+async function teacherAiSettings() {
+  try {
+    const setting = await api("/teacher-ai");
+    modal(
+      `<h2>내 AI 연결</h2><p class="muted">내 모든 수업에 적용됩니다. 학생은 API 키를 입력하지 않습니다.</p><div class="notice">${setting.local ? "교사 PC 로컬 설치 버전" : "공개 웹앱"} · ${setting.available ? "AI 사용 가능" : "AI 연결 설정 필요"}</div><form id="teacher-ai-form"><label for="ai-mode">이용 방식</label><select id="ai-mode">${!setting.local ? `<option value="shared" ${setting.mode === "shared" ? "selected" : ""}>공용 Cloudflare AI 사용</option>` : ""}<option value="personal" ${setting.mode === "personal" ? "selected" : ""}>내 AI 계정 연결</option><option value="disabled" ${setting.mode === "disabled" ? "selected" : ""}>AI 사용 끄기</option></select><div id="personal-ai-fields"><label for="ai-provider">AI 서비스</label><select id="ai-provider">${setting.local ? `<option value="google" ${setting.provider === "google" ? "selected" : ""}>학교 Google 계정 · Gemini API</option>` : ""}<option value="cloudflare" ${setting.provider === "cloudflare" ? "selected" : ""}>내 Cloudflare Workers AI</option></select><div id="cf-fields"><label for="ai-account">Cloudflare Account ID</label><input id="ai-account" maxlength="32" autocomplete="off" value="${esc(setting.accountId)}"></div><div id="google-fields"><p class="notice">goedu.kr 학교 Google 계정으로 <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener">Google AI Studio</a>에 로그인하고 Gemini API 키를 발급하세요. 일반 Gemini 웹 로그인과 API 이용 권한은 별개입니다.</p><label for="ai-model">Gemini 모델</label><input id="ai-model" maxlength="90" value="${esc(setting.model)}"><p class="muted">기본 모델은 gemini-3.5-flash-lite입니다. 학교 계정에서 허용된 모델 이름으로 변경할 수 있습니다.</p></div><label for="ai-token" id="ai-token-label">API 키 / 토큰</label><input id="ai-token" type="password" maxlength="2000" autocomplete="new-password" placeholder="${setting.configured ? "변경할 때만 새 키를 입력하세요." : "발급한 API 키를 입력하세요."}"><p class="muted">${setting.local ? "키는 이 컴퓨터의 수업 데이터베이스에 암호화해 저장합니다." : "토큰은 서버에 암호화해 저장합니다."} 학생이나 다른 교사에게 원문을 공개하지 않습니다.</p><label for="ai-limit">내 계정의 하루 분석 요청 한도</label><input id="ai-limit" type="number" min="1" max="1000" value="${setting.dailyLimit}"><label class="check"><input id="ai-consent" type="checkbox"><span id="ai-consent-label"></span></label></div><div class="actions"><button type="submit">설정 저장</button><button type="button" id="test-ai" class="secondary">저장된 연결 테스트</button><button type="button" id="remove-ai" class="text-button">개인 연결 삭제</button></div></form><p id="ai-test-result" class="notice" hidden></p><div class="actions"><a href="${setting.local ? "/local-guide.html" : "/ai-guide.html"}" target="_blank" rel="noopener">교사용 연결·설치 안내문 ↗</a></div><p class="muted">개인 계정의 API 이용 한도와 결제 정책이 적용됩니다. 개인 연결 오류 시 다른 서비스로 자동 전환하지 않습니다.</p>`,
+    );
+    const update = () => {
+      const google = $("#ai-provider").value === "google";
+      $("#personal-ai-fields").hidden = $("#ai-mode").value !== "personal";
+      $("#cf-fields").hidden = google;
+      $("#google-fields").hidden = !google;
+      $("#ai-token-label").textContent = google
+        ? "학교 Google 계정에서 발급한 Gemini API 키"
+        : "Workers AI API 토큰";
+      $("#ai-consent-label").textContent =
+        `내 수업의 공통 읽기 자료·희망 분야·에세이 초안·사진을 ${google ? "Google Gemini API" : "Cloudflare Workers AI"}로 전송하여 분석하고, 내 계정의 이용량에 포함되는 것을 확인했습니다.`;
+    };
+    update();
+    $("#ai-mode").onchange = update;
+    $("#ai-provider").onchange = update;
+    $("#teacher-ai-form").onsubmit = (e) => {
+      e.preventDefault();
+      busy(e.submitter, async () => {
+        const result = await api("/teacher-ai", "PUT", {
+          mode: $("#ai-mode").value,
+          provider: $("#ai-provider").value,
+          model: $("#ai-model").value,
+          accountId: $("#ai-account").value,
+          token: $("#ai-token").value,
+          dailyLimit: Number($("#ai-limit").value),
+          consent: $("#ai-consent").checked,
+        });
+        $("#ai-token").value = "";
+        state.me.ai = result.available;
+        toast("설정을 저장했습니다. 연결 테스트로 확인하세요.");
+        await teacherAiSettings();
+      });
+    };
+    $("#test-ai").onclick = (e) =>
+      busy(e.currentTarget, async () => {
+        const d = await api("/teacher-ai/test", "POST");
+        $("#ai-test-result").hidden = false;
+        $("#ai-test-result").textContent = d.message + " " + d.sample;
+      });
+    $("#remove-ai").onclick = (e) =>
+      busy(e.currentTarget, async () => {
+        if (
+          !confirm(
+            setting.local
+              ? "개인 연결을 삭제하고 AI 사용을 끌까요?"
+              : "개인 연결을 삭제하고 공용 AI로 돌아갈까요?",
+          )
+        )
+          return;
+        const d = await api("/teacher-ai", "DELETE");
+        state.me.ai = d.available;
+        await teacherAiSettings();
+        toast("개인 연결을 삭제했습니다.");
+      });
+  } catch (e) {
+    toast(e.message, true);
+  }
+}
+
 function teacherHome() {
-  app.innerHTML = `<div class="workspace-header"><div><span class="eyebrow">TEACHER STUDIO</span><h1>질문이 자라는 수업을 만드세요.</h1><p class="muted">자료 준비부터 학생의 수정 과정까지, 수업별로 관리합니다.</p></div><button id="new-class">+ 새 수업 만들기</button></div>${!state.me.ai ? '<div class="notice warn">AI API가 아직 연결되지 않았습니다. 운영자가 서버에 키를 설정하면 모든 수업에서 사용할 수 있습니다.</div>' : ""}<div class="class-list">${state.me.classes.map((c) => `<div class="card"><span class="tag">${c.active ? "진행 중" : "종료됨"}</span><h3 class="actions">${esc(c.title)}</h3><p>참여 코드 <span class="code">${esc(c.code)}</span></p><button class="secondary full" data-class="${esc(c.id)}">수업 관리하기 →</button></div>`).join("") || '<div class="empty">첫 수업을 만들어 공통 읽기 자료를 준비해 보세요.</div>'}</div>`;
+  app.innerHTML = `<div class="workspace-header"><div><span class="eyebrow">TEACHER STUDIO</span><h1>질문이 자라는 수업을 만드세요.</h1><p class="muted">자료 준비부터 학생의 수정 과정까지, 수업별로 관리합니다.</p></div><div class="actions"><button id="my-ai-settings" class="secondary">내 AI 연결</button><button id="new-class">+ 새 수업 만들기</button></div></div>${!state.me.ai ? '<div class="notice warn">AI 연결이 꺼져 있거나 설정이 필요합니다. 내 AI 연결에서 이용 방식을 확인해 주세요.</div>' : ""}${state.me.local ? `<div class="notice"><b>교사 PC에서 실행 중</b><p>학생과 같은 학교망에서 사용하세요. 수업 중 이 컴퓨터를 켜 둡니다.</p>${(state.me.localAddresses || []).map((a) => `<p>${esc(a.label)} 학생 접속 주소: <a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.url)}</a></p>`).join("")}<a href="/local-guide.html" target="_blank" rel="noopener">학교 Google 계정 연결·로컬 설치 안내 ↗</a></div>` : ""}<div class="class-list">${state.me.classes.map((c) => `<div class="card"><span class="tag">${c.active ? "진행 중" : "종료됨"}</span><h3 class="actions">${esc(c.title)}</h3><p>참여 코드 <span class="code">${esc(c.code)}</span></p><button class="secondary full" data-class="${esc(c.id)}">수업 관리하기 →</button></div>`).join("") || '<div class="empty">첫 수업을 만들어 공통 읽기 자료를 준비해 보세요.</div>'}</div>`;
+  $("#my-ai-settings").onclick = teacherAiSettings;
   $("#new-class").onclick = () => {
     modal(
       '<h2>새 수업 만들기</h2><form id="new-class-form"><label for="class-title">수업 이름</label><input id="class-title" maxlength="120" required placeholder="예: 1학년 진로 에세이 · 파주와 나"><button class="actions">수업 만들기</button></form>',
@@ -507,10 +572,11 @@ async function openClass(id) {
 }
 async function teacherScreen() {
   const c = state.class;
-  app.innerHTML = `<button id="all-classes" class="text-button">← 내 수업 목록</button><div class="workspace-header"><div><span class="eyebrow">CLASSROOM MANAGEMENT</span><h1>${esc(c.title)}</h1><p>참여 코드 <span class="code">${esc(c.code)}</span> · ${c.active ? "수업 진행 중" : "종료된 수업"}</p></div><div class="actions"><button id="copy-link" class="secondary">학생 참여 링크 복사</button><button id="export" class="secondary">기록 내려받기</button></div></div><nav class="tabs teacher-tabs"><button data-tab="material" class="${state.tab === "material" ? "active" : ""}">공통 자료 준비</button><button data-tab="students" class="${state.tab === "students" ? "active" : ""}">학생 진행 현황</button><button data-tab="board" class="${state.tab === "board" ? "active" : ""}">에세이 · 댓글</button><button data-tab="settings" class="${state.tab === "settings" ? "active" : ""}">수업 관리</button></nav><div id="teacher-content"></div>`;
+  app.innerHTML = `<button id="all-classes" class="text-button">← 내 수업 목록</button><div class="workspace-header"><div><span class="eyebrow">CLASSROOM MANAGEMENT</span><h1>${esc(c.title)}</h1><p>참여 코드 <span class="code">${esc(c.code)}</span> · ${c.active ? "수업 진행 중" : "종료된 수업"}</p></div><div class="actions"><button id="my-ai-settings" class="secondary">내 AI 연결</button><button id="copy-link" class="secondary">학생 참여 링크 복사</button><button id="export" class="secondary">기록 내려받기</button></div></div><nav class="tabs teacher-tabs"><button data-tab="material" class="${state.tab === "material" ? "active" : ""}">공통 자료 준비</button><button data-tab="students" class="${state.tab === "students" ? "active" : ""}">학생 진행 현황</button><button data-tab="board" class="${state.tab === "board" ? "active" : ""}">에세이 · 댓글</button><button data-tab="settings" class="${state.tab === "settings" ? "active" : ""}">수업 관리</button></nav><div id="teacher-content"></div>`;
   $("#all-classes").onclick = () => loadMe();
+  $("#my-ai-settings").onclick = teacherAiSettings;
   $("#copy-link").onclick = async () => {
-    const link = `${location.origin}/?class=${c.code}`;
+    const link = `${state.me.localBaseURL || location.origin}/?class=${c.code}`;
     try {
       await navigator.clipboard.writeText(link);
       toast("학생 참여 링크를 복사했습니다.");

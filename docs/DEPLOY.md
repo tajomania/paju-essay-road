@@ -3,7 +3,7 @@
 
 현재 GitHub 저장소: https://github.com/tajomania/paju-essay-road
 
-현재 배포는 AI_ENABLED=false이며, 외부 AI 전송은 승인 대기 상태입니다. Cloudflare 내장 AI 연결 코드와 OpenAI 선택 연결 코드는 준비되어 있지만 아직 실제 AI 분석이 활성화된 것은 아닙니다.
+현재 Cloudflare Workers AI가 활성화되어 있습니다. 교사는 내 AI 연결에서 공용 AI, 개인 Cloudflare 계정, AI 사용 끄기를 선택할 수 있습니다. 학생은 별도 API 키 없이 이용합니다.
 
 
 배포 운영자만 이 설정을 수행합니다. 다른 교사와 학생은 완성된 웹앱 주소로 접속합니다. 이 문서는 현재 배포 완료를 뜻하지 않으며, 실제 배포 URL은 GitHub Actions/Cloudflare가 성공한 뒤 확인합니다.
@@ -56,7 +56,7 @@ Cloudflare Account ID를 확인하고, API Token을 만듭니다. 해당 계정�
 
 ## 5. 승인 후 AI 연결 활성화
 
-현재 AI_ENABLED=false로 외부 AI 전송이 차단되어 있습니다. 학생의 읽기 자료·관심 분야·초안·사진을 외부 AI에 전송하는 운영 방식이 승인된 후에만 활성화합니다.
+학생의 읽기 자료·관심 분야·초안·사진을 Cloudflare Workers AI로 전송하는 운영 방식이 승인되어 AI_ENABLED=true와 AI 바인딩으로 활성화했습니다.
 
 Cloudflare 내장 AI를 사용할 때는 wrangler.jsonc에 ai: {binding: "AI"}를 추가하고 vars의 AI_ENABLED를 "true", CLOUDFLARE_AI_MODEL을 "@cf/qwen/qwen3.8-27b"로 설정해 배포합니다. 키 입력은 필요 없지만 Workers AI 사용량과 계정 한도가 적용됩니다.
 
@@ -88,6 +88,12 @@ Actions 로그의 배포 성공과 `https://…workers.dev` URL을 확인합니�
 
 ## 변경 배포와 기록 관리
 
-main 브랜치에 소스 변경을 올리면 자동 배포됩니다. 학생 데이터는 소스 저장소와 별개입니다. 교사는 수업 관리 화면에서 기록을 내려받고 필요 시 수업을 종료하거나 삭제합니다. 운영자는 Cloudflare D1 백업·복원 설정과 API 결제·사용량을 관리합니다.
+DEPLOY_ENABLED=true와 배포 토큰이 설정된 경우 main 브랜치 변경을 자동 배포합니다. 현재 공개 배포는 운영자의 Wrangler 연결로 수행하며 GitHub 자동 배포는 토큰 설정 후 활성화할 수 있습니다. 학생 데이터는 소스 저장소와 별개입니다. 교사는 수업 관리 화면에서 기록을 내려받고 필요 시 수업을 종료하거나 삭제합니다. 운영자는 Cloudflare D1 백업·복원 설정과 API 결제·사용량을 관리합니다.
 
 GitHub Pages에 `public/`만 배포하면 화면 파일은 열리더라도 `/api/` 서버가 없어 수업 참여·공유·AI는 작동하지 않습니다. 이 앱은 전체 Worker 배포를 사용해야 합니다.
+
+## 교사별 토큰 암호화
+
+개인 토큰을 저장하려면 AI_KEY_ENCRYPTION_SECRET을 Worker Secret으로 설정합니다. 현재 운영 서버에는 이미 등록했습니다. 암호화는 교사 ID를 추가 인증 데이터로 사용하는 AES-GCM입니다. 비밀값을 임의로 교체하면 기존 개인 토큰을 읽을 수 없으므로, 키 변경 시 교사 재연결 또는 별도 재암호화 절차가 필요합니다. 이 비밀값을 소스에 커밋하지 않습니다.
+
+교사 개인 연결의 일일 한도는 같은 교사의 모든 수업 분석 요청을 합산합니다. 연결 테스트는 별도 하루 8회 한도이며 제공사 이용량에는 포함될 수 있습니다. 개인 토큰과 Account ID는 글쓰기 기록 내보내기에 포함하지 않습니다.

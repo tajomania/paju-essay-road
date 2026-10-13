@@ -3,10 +3,18 @@
 
 현재 GitHub 저장소: https://github.com/tajomania/paju-essay-road
 
-현재 배포는 AI_ENABLED=false이며, 외부 AI 전송은 승인 대기 상태입니다. Cloudflare 내장 AI 연결 코드와 OpenAI 선택 연결 코드는 준비되어 있지만 아직 실제 AI 분석이 활성화된 것은 아닙니다.
+현재 Cloudflare Workers AI가 활성화되어 있습니다. 교사는 내 AI 연결에서 공용 AI, 개인 Cloudflare 계정, AI 사용 끄기를 선택할 수 있습니다. 학생은 별도 API 키 없이 이용합니다.
 
 
 공통 읽기 자료를 자신의 진로로 해석하고, 학생이 직접 에세이를 작성한 뒤 AI 피드백을 비판적으로 검토하는 4단계 수업 웹앱입니다. 학생은 휴대폰·태블릿으로, 교사는 컴퓨터로 이용합니다.
+
+## 교사 PC에 설치하고 학교 Google 계정 사용
+
+[Windows 실행 패키지](https://github.com/tajomania/paju-essay-road/releases/download/v1.1.0/Paju-Essay-Road-Windows.zip)를 내려받아 전체 압축을 풀고 Start-Classroom.cmd를 실행합니다. 별도 Node.js 설치 없이 시작합니다. 내 AI 연결에서 학교 Google 계정으로 AI Studio에 로그인해 발급한 Gemini API 키를 연결합니다. 계정의 AI Studio·프로젝트 권한은 학교 관리자 정책에 따라 제한될 수 있습니다. 이 방식은 Google OAuth 로그인 버튼이 아니라 학교 계정 발급 API 키 연결입니다.
+
+학생은 같은 학교망에서 교사 PC의 참여 링크로 이용합니다. 로컬 기록과 암호화된 키는 교사 PC에 저장하며 공개 서버와 별개입니다. Gemini 분석은 Google API로 전송되므로 인터넷이 필요합니다.
+
+[학교 Google 계정·로컬 설치 안내](docs/LOCAL_GOOGLE_GUIDE.md) · [웹 안내문](https://paju-essay-road.essay-road.workers.dev/local-guide.html)
 
 ## 이용 흐름
 
@@ -16,7 +24,7 @@
 4. 학생이 수업용 별명과 비밀번호로 참여합니다. 같은 정보로 다른 기기에서도 다시 접속할 수 있습니다.
 5. 읽기 메모·진로 연결 키워드 → 중심 질문·주장·개요 → 직접 작성한 초안·피드백 수용/거절 기록 → 최종 에세이·댓글·성찰로 이어집니다.
 
-학생과 배포를 받는 교사는 별도 설치나 API 키 입력이 필요 없습니다. 운영자가 서버와 AI 연결을 한 번 설정해야 합니다. Cloudflare Workers AI를 기본 연결 후보로 준비했으며, OpenAI API도 선택적으로 사용할 수 있습니다. 외부 AI 전송이 승인되기 전에는 서버의 AI_ENABLED=false로 AI 기능을 차단합니다. **GitHub Pages만으로는 서버 저장과 AI 분석을 실행할 수 없습니다.** GitHub는 소스 및 자동 배포를 관리하고 Cloudflare Workers/D1이 앱과 데이터를 실행합니다.
+학생과 배포를 받는 교사는 별도 설치나 API 키 입력이 필요 없습니다. 운영자가 서버와 AI 연결을 한 번 설정해야 합니다. Cloudflare Workers AI를 기본 연결로 제공하며, OpenAI API도 선택적으로 사용할 수 있습니다. 교사는 내 AI 연결에서 자신의 Cloudflare 계정을 연결할 수 있으며, 토큰은 서버에 암호화해 저장됩니다. **GitHub Pages만으로는 서버 저장과 AI 분석을 실행할 수 없습니다.** GitHub는 소스 및 자동 배포를 관리하고 Cloudflare Workers/D1이 앱과 데이터를 실행합니다.
 
 ## 포함 기능
 
@@ -32,6 +40,12 @@
 - 학급 내부 최종 글·댓글·소감 게시, 교사 숨김 관리
 - 자동 저장, 학생 진행 현황, 학생별 기록 조회
 - 교사의 학생 비밀번호 초기화, 수업 종료·재개·삭제, JSON 기록 내려받기
+
+## 교사별 AI 연결
+
+교사 로그인 후 **내 AI 연결**을 누릅니다. 자신의 Cloudflare Account ID와 Workers AI API 토큰을 저장하고 연결 테스트를 실행합니다. 개인 연결은 해당 교사의 수업에만 적용하며 다른 교사나 학생은 토큰을 조회할 수 없습니다. 하루 요청 한도를 설정하거나 연결을 삭제할 수 있습니다. 개인 연결 오류 시 공용 AI로 자동 전환하지 않습니다.
+
+[웹 안내문](https://paju-essay-road.essay-road.workers.dev/ai-guide.html) · [교사용 안내 원문](docs/TEACHER_AI_GUIDE.md)
 
 ## AI 원칙
 

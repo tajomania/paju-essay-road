@@ -9,7 +9,9 @@ if (
   throw new Error(
     "Set repository variable D1_DATABASE_ID to the provisioned Cloudflare D1 ID.",
   );
-const config = JSON.parse(fs.readFileSync("wrangler.jsonc", "utf8"));
+const config = JSON.parse(
+  fs.readFileSync("wrangler.jsonc", "utf8").replace(/,\s*([}\]])/g, "$1"),
+);
 config.d1_databases[0].database_id = id;
 if (process.env.WORKER_NAME) {
   if (!/^[a-z][a-z0-9-]{2,62}$/.test(process.env.WORKER_NAME))

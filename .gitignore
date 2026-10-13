@@ -5,3 +5,7 @@ node_modules/
 !.env.example
 artifacts/
 *.zip
+*.key
+*.sqlite*
+*.pid
+.local-data/

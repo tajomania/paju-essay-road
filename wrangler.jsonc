@@ -20,6 +20,10 @@
     "OPENAI_MODEL": "gpt-4.1-mini",
     "AI_DAILY_LIMIT": "1000",
     "CLASS_AI_DAILY_LIMIT": "150",
-    "AI_ENABLED": "false",
+    "AI_ENABLED": "true",
+    "CLOUDFLARE_AI_MODEL": "@cf/qwen/qwen3.8-27b",
+  },
+  "ai": {
+    "binding": "AI",
   },
 }

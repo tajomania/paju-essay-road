@@ -1012,3 +1012,5 @@ dialog h2 {
 .guide h1 {
   font-size: clamp(30px, 4vw, 44px);
 }
+
+.creator-credit { margin: 12px 0 0; font-size: 0.9rem; }

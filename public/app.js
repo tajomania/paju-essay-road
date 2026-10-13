@@ -73,7 +73,7 @@ function modal(html) {
 $("#close-dialog").onclick = () => $("#dialog").close();
 $("#privacy").onclick = () =>
   modal(
-    `<h2>이용·개인정보 안내</h2><p>실명 대신 수업용 별명을 사용하세요. 교사 ID, 암호화된 비밀번호, 수업 자료, 글쓰기 기록, AI 피드백, 게시글과 댓글을 저장합니다. 학생 초안과 수정 기록은 해당 학생과 수업 교사에게만 제공하며, 주제와 완성 글은 학생이 공유할 때 같은 학급에 공개합니다.</p><p>AI 요청 시 읽기 자료, 관심 분야, 초안 또는 사진이 운영자가 설정한 AI 서비스(Cloudflare Workers AI 또는 로컬 버전의 Google Gemini API)로 전송됩니다. API 요청에 응답 보관 비활성화를 설정했지만 제공사의 데이터 처리 정책도 적용됩니다. 사진 원본은 앱 서버에 저장하지 않으며, 선택한 사진은 화면을 떠나거나 새로고침하면 사라집니다.</p><p>교사는 수업 기록을 내려받고 수업을 삭제할 수 있습니다. 학교의 학생 개인정보 처리 안내에 따라 이용하세요. AI 피드백은 오류가 있을 수 있으므로 학생과 교사가 검토합니다. AI 기능은 운영자의 사용량 한도 내에서 제공됩니다.</p><p>학생 비밀번호를 잊으면 수업 교사에게 초기화를 요청하세요. 교사는 가입할 때 발급된 복구 코드로 비밀번호를 바꿀 수 있습니다. 자동 로그아웃은 로그인 후 7일입니다.</p>`,
+    `<h2>이용·개인정보 안내</h2><p>실명 대신 수업용 별명을 사용하세요. 교사 ID, 교사가 등록한 학교 이메일, 암호화된 비밀번호, 수업 자료, 글쓰기 기록, AI 피드백, 게시글과 댓글을 저장합니다. 학생 초안과 수정 기록은 해당 학생과 수업 교사에게만 제공하며, 주제와 완성 글은 학생이 공유할 때 같은 학급에 공개합니다.</p><p>AI 요청 시 읽기 자료, 관심 분야, 초안 또는 사진이 교사가 등록한 학교 Google Gemini API로 전송됩니다. Google의 API 데이터 처리 정책이 적용됩니다. 사진 원본은 앱 서버에 저장하지 않으며, 선택한 사진은 화면을 떠나거나 새로고침하면 사라집니다.</p><p>교사는 수업 기록을 내려받고 수업을 삭제할 수 있습니다. 학교의 학생 개인정보 처리 안내에 따라 이용하세요. AI 피드백은 오류가 있을 수 있으므로 학생과 교사가 검토합니다. AI 기능은 교사 학교 API 계정의 사용량 한도 내에서 제공됩니다.</p><p>학생 비밀번호를 잊으면 수업 교사에게 초기화를 요청하세요. 교사는 가입할 때 발급된 복구 코드로 비밀번호를 바꿀 수 있습니다. 자동 로그아웃은 로그인 후 7일입니다.</p>`,
   );
 const materials = [
   {
@@ -481,30 +481,19 @@ async function teacherAiSettings() {
   try {
     const setting = await api("/teacher-ai");
     modal(
-      `<h2>내 AI 연결</h2><p class="muted">내 모든 수업에 적용됩니다. 학생은 API 키를 입력하지 않습니다.</p><div class="notice">${setting.local ? "교사 PC 로컬 설치 버전" : "공개 웹앱"} · ${setting.available ? "AI 사용 가능" : "AI 연결 설정 필요"}</div><form id="teacher-ai-form"><label for="ai-mode">이용 방식</label><select id="ai-mode">${!setting.local ? `<option value="shared" ${setting.mode === "shared" ? "selected" : ""}>공용 Cloudflare AI 사용</option>` : ""}<option value="personal" ${setting.mode === "personal" ? "selected" : ""}>내 AI 계정 연결</option><option value="disabled" ${setting.mode === "disabled" ? "selected" : ""}>AI 사용 끄기</option></select><div id="personal-ai-fields"><label for="ai-provider">AI 서비스</label><select id="ai-provider">${setting.local ? `<option value="google" ${setting.provider === "google" ? "selected" : ""}>학교 Google 계정 · Gemini API</option>` : ""}<option value="cloudflare" ${setting.provider === "cloudflare" ? "selected" : ""}>내 Cloudflare Workers AI</option></select><div id="cf-fields"><label for="ai-account">Cloudflare Account ID</label><input id="ai-account" maxlength="32" autocomplete="off" value="${esc(setting.accountId)}"></div><div id="google-fields"><p class="notice">goedu.kr 학교 Google 계정으로 <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener">Google AI Studio</a>에 로그인하고 Gemini API 키를 발급하세요. 일반 Gemini 웹 로그인과 API 이용 권한은 별개입니다.</p><label for="ai-model">Gemini 모델</label><input id="ai-model" maxlength="90" value="${esc(setting.model)}"><p class="muted">기본 모델은 gemini-3.5-flash-lite입니다. 학교 계정에서 허용된 모델 이름으로 변경할 수 있습니다.</p></div><label for="ai-token" id="ai-token-label">API 키 / 토큰</label><input id="ai-token" type="password" maxlength="2000" autocomplete="new-password" placeholder="${setting.configured ? "변경할 때만 새 키를 입력하세요." : "발급한 API 키를 입력하세요."}"><p class="muted">${setting.local ? "키는 이 컴퓨터의 수업 데이터베이스에 암호화해 저장합니다." : "토큰은 서버에 암호화해 저장합니다."} 학생이나 다른 교사에게 원문을 공개하지 않습니다.</p><label for="ai-limit">내 계정의 하루 분석 요청 한도</label><input id="ai-limit" type="number" min="1" max="1000" value="${setting.dailyLimit}"><label class="check"><input id="ai-consent" type="checkbox"><span id="ai-consent-label"></span></label></div><div class="actions"><button type="submit">설정 저장</button><button type="button" id="test-ai" class="secondary">저장된 연결 테스트</button><button type="button" id="remove-ai" class="text-button">개인 연결 삭제</button></div></form><p id="ai-test-result" class="notice" hidden></p><div class="actions"><a href="${setting.local ? "/local-guide.html" : "/ai-guide.html"}" target="_blank" rel="noopener">교사용 연결·설치 안내문 ↗</a></div><p class="muted">개인 계정의 API 이용 한도와 결제 정책이 적용됩니다. 개인 연결 오류 시 다른 서비스로 자동 전환하지 않습니다.</p>`,
+      `<h2>학교 Google API 연결</h2><p class="muted">내 모든 수업에 적용됩니다. 학생은 API 키를 입력하지 않습니다.</p><div class="notice">${setting.local ? "교사 PC 로컬 설치 버전" : "공개 웹앱"} · ${setting.configured ? "키 저장됨 · 연결 테스트로 확인하세요" : "학교 API 등록 필요"}</div><form id="teacher-ai-form"><label for="ai-mode">이용 방식</label><select id="ai-mode"><option value="personal" ${setting.mode === "personal" ? "selected" : ""}>goedu.kr 학교 Google API 등록</option><option value="disabled" ${setting.mode === "disabled" ? "selected" : ""}>AI 사용 끄기</option></select><div id="personal-ai-fields"><p class="notice">학교 Google 계정(@goedu.kr)으로 <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener">Google AI Studio</a>에 로그인하고 Gemini API 키를 발급하세요. 일반 Gemini 로그인과 API 권한은 별개입니다.</p><label for="ai-school-email">학교 Google 이메일</label><input id="ai-school-email" type="email" maxlength="200" autocomplete="off" placeholder="teacher@goedu.kr" value="${esc(setting.schoolEmail)}"><p class="muted">이메일 형식만 확인합니다. API 키만으로 학교 계정 소유를 인증할 수 없으므로 발급 계정을 직접 확인하세요.</p><label for="ai-model">Gemini 모델</label><input id="ai-model" maxlength="90" value="${esc(setting.model)}"><label for="ai-token">학교 계정에서 발급한 Gemini API 키</label><input id="ai-token" type="password" maxlength="2000" autocomplete="new-password" placeholder="${setting.configured ? "변경할 때만 새 키를 입력하세요." : "발급한 API 키를 입력하세요."}"><p class="muted">키는 ${setting.local ? "이 컴퓨터" : "웹앱 서버"}의 데이터베이스에 암호화해 저장합니다. 학생이나 다른 교사에게 원문을 공개하지 않습니다.</p><label for="ai-limit">내 계정의 하루 분석 요청 한도</label><input id="ai-limit" type="number" min="1" max="1000" value="${setting.dailyLimit}"><label class="check"><input id="ai-consent" type="checkbox"><span>내 수업의 공통 읽기 자료·희망 분야·에세이 초안·사진을 Google Gemini API로 전송하여 분석하고, 내 계정의 이용량에 포함되는 것을 확인했습니다.</span></label></div><div class="actions"><button type="submit">설정 저장</button><button type="button" id="test-ai" class="secondary" ${!setting.configured ? "disabled" : ""}>저장된 연결 테스트</button><button type="button" id="remove-ai" class="text-button">학교 API 연결 삭제</button></div></form><p id="ai-test-result" class="notice" hidden></p><a href="/ai-guide.html" target="_blank" rel="noopener">교사용 API 연결 안내 ↗</a><p class="muted">학교 계정의 API 이용 한도와 결제 정책이 적용됩니다. 연결 오류 시 다른 서비스로 자동 전환하지 않습니다.</p>`,
     );
-    const update = () => {
-      const google = $("#ai-provider").value === "google";
-      $("#personal-ai-fields").hidden = $("#ai-mode").value !== "personal";
-      $("#cf-fields").hidden = google;
-      $("#google-fields").hidden = !google;
-      $("#ai-token-label").textContent = google
-        ? "학교 Google 계정에서 발급한 Gemini API 키"
-        : "Workers AI API 토큰";
-      $("#ai-consent-label").textContent =
-        `내 수업의 공통 읽기 자료·희망 분야·에세이 초안·사진을 ${google ? "Google Gemini API" : "Cloudflare Workers AI"}로 전송하여 분석하고, 내 계정의 이용량에 포함되는 것을 확인했습니다.`;
-    };
+    const update = () => { $("#personal-ai-fields").hidden = $("#ai-mode").value !== "personal"; };
     update();
     $("#ai-mode").onchange = update;
-    $("#ai-provider").onchange = update;
     $("#teacher-ai-form").onsubmit = (e) => {
       e.preventDefault();
       busy(e.submitter, async () => {
         const result = await api("/teacher-ai", "PUT", {
           mode: $("#ai-mode").value,
-          provider: $("#ai-provider").value,
+          provider: "google",
           model: $("#ai-model").value,
-          accountId: $("#ai-account").value,
+          schoolEmail: $("#ai-school-email").value,
           token: $("#ai-token").value,
           dailyLimit: Number($("#ai-limit").value),
           consent: $("#ai-consent").checked,
@@ -525,9 +514,7 @@ async function teacherAiSettings() {
       busy(e.currentTarget, async () => {
         if (
           !confirm(
-            setting.local
-              ? "개인 연결을 삭제하고 AI 사용을 끌까요?"
-              : "개인 연결을 삭제하고 공용 AI로 돌아갈까요?",
+            "학교 API 연결을 삭제하고 AI 사용을 끌까요?",
           )
         )
           return;

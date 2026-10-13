@@ -3,14 +3,14 @@
 
 현재 GitHub 저장소: https://github.com/tajomania/paju-essay-road
 
-현재 Cloudflare Workers AI가 활성화되어 있습니다. 교사는 내 AI 연결에서 공용 AI, 개인 Cloudflare 계정, AI 사용 끄기를 선택할 수 있습니다. 학생은 별도 API 키 없이 이용합니다.
+공개 웹앱과 로컬 버전 모두 교사가 @goedu.kr 학교 Google 계정에서 발급한 Gemini API 키를 등록합니다. 공용 AI 연결은 제거되었습니다. 학생은 별도 키 없이 이용합니다. [교사 연결 안내](docs/TEACHER_AI_GUIDE.md)
 
 
 공통 읽기 자료를 자신의 진로로 해석하고, 학생이 직접 에세이를 작성한 뒤 AI 피드백을 비판적으로 검토하는 4단계 수업 웹앱입니다. 학생은 휴대폰·태블릿으로, 교사는 컴퓨터로 이용합니다.
 
 ## 교사 PC에 설치하고 학교 Google 계정 사용
 
-[Windows 실행 패키지](https://github.com/tajomania/paju-essay-road/releases/download/v1.1.0/Paju-Essay-Road-Windows.zip)를 내려받아 전체 압축을 풀고 Start-Classroom.cmd를 실행합니다. 별도 Node.js 설치 없이 시작합니다. 내 AI 연결에서 학교 Google 계정으로 AI Studio에 로그인해 발급한 Gemini API 키를 연결합니다. 계정의 AI Studio·프로젝트 권한은 학교 관리자 정책에 따라 제한될 수 있습니다. 이 방식은 Google OAuth 로그인 버튼이 아니라 학교 계정 발급 API 키 연결입니다.
+[Windows 실행 패키지](https://github.com/tajomania/paju-essay-road/releases/download/v1.1.1/Paju-Essay-Road-Windows.zip)를 내려받아 전체 압축을 풀고 Start-Classroom.cmd를 실행합니다. 별도 Node.js 설치 없이 시작합니다. 내 AI 연결에서 학교 Google 계정으로 AI Studio에 로그인해 발급한 Gemini API 키를 연결합니다. 계정의 AI Studio·프로젝트 권한은 학교 관리자 정책에 따라 제한될 수 있습니다. 이 방식은 Google OAuth 로그인 버튼이 아니라 학교 계정 발급 API 키 연결입니다.
 
 학생은 같은 학교망에서 교사 PC의 참여 링크로 이용합니다. 로컬 기록과 암호화된 키는 교사 PC에 저장하며 공개 서버와 별개입니다. Gemini 분석은 Google API로 전송되므로 인터넷이 필요합니다.
 
@@ -24,7 +24,7 @@
 4. 학생이 수업용 별명과 비밀번호로 참여합니다. 같은 정보로 다른 기기에서도 다시 접속할 수 있습니다.
 5. 읽기 메모·진로 연결 키워드 → 중심 질문·주장·개요 → 직접 작성한 초안·피드백 수용/거절 기록 → 최종 에세이·댓글·성찰로 이어집니다.
 
-학생과 배포를 받는 교사는 별도 설치나 API 키 입력이 필요 없습니다. 운영자가 서버와 AI 연결을 한 번 설정해야 합니다. Cloudflare Workers AI를 기본 연결로 제공하며, OpenAI API도 선택적으로 사용할 수 있습니다. 교사는 내 AI 연결에서 자신의 Cloudflare 계정을 연결할 수 있으며, 토큰은 서버에 암호화해 저장됩니다. **GitHub Pages만으로는 서버 저장과 AI 분석을 실행할 수 없습니다.** GitHub는 소스 및 자동 배포를 관리하고 Cloudflare Workers/D1이 앱과 데이터를 실행합니다.
+공개 웹앱과 로컬 버전 모두 교사가 @goedu.kr 학교 Google 계정에서 발급한 Gemini API 키를 등록합니다. 공용 AI 연결은 제거되었습니다. 학생은 별도 키 없이 이용합니다. [교사 연결 안내](docs/TEACHER_AI_GUIDE.md)
 
 ## 포함 기능
 
@@ -43,7 +43,7 @@
 
 ## 교사별 AI 연결
 
-교사 로그인 후 **내 AI 연결**을 누릅니다. 자신의 Cloudflare Account ID와 Workers AI API 토큰을 저장하고 연결 테스트를 실행합니다. 개인 연결은 해당 교사의 수업에만 적용하며 다른 교사나 학생은 토큰을 조회할 수 없습니다. 하루 요청 한도를 설정하거나 연결을 삭제할 수 있습니다. 개인 연결 오류 시 공용 AI로 자동 전환하지 않습니다.
+공개 웹앱과 로컬 버전 모두 교사가 @goedu.kr 학교 Google 계정에서 발급한 Gemini API 키를 등록합니다. 공용 AI 연결은 제거되었습니다. 학생은 별도 키 없이 이용합니다. [교사 연결 안내](docs/TEACHER_AI_GUIDE.md)
 
 [웹 안내문](https://paju-essay-road.essay-road.workers.dev/ai-guide.html) · [교사용 안내 원문](docs/TEACHER_AI_GUIDE.md)
 
@@ -81,10 +81,10 @@ pnpm exec wrangler deploy --dry-run
 
 비밀번호는 PBKDF2로 해시하고, 로그인 세션은 HttpOnly·SameSite 쿠키를 사용합니다. 운영 HTTPS에서 Secure를 적용합니다. 학생 초안과 수정 기록은 해당 학생과 담당 교사만 조회하며, 공유한 주제·게시글은 해당 학급 내부에만 공개합니다. 사진은 인식 요청 시 API로 전송하되 앱 서버에 원본을 보관하지 않습니다. 문자 인식 결과와 글쓰기 기록은 D1에 저장합니다.
 
-AI는 Cloudflare Workers AI 바인딩 또는 운영자의 OpenAI API 키를 서버에서 사용합니다. Cloudflare 내장 AI는 별도의 제공사 API 키가 필요 없습니다. AI_ENABLED=true와 AI 바인딩 또는 API 키가 모두 설정되어야 실제 전송이 가능합니다. 기본 요청 상한은 학생 12회/일, 교사 30회/일, 학급 150회/일, 앱 전체 1,000회/일입니다. 하루는 한국 시간 기준입니다. 실패한 AI 요청도 요청 상한에 포함될 수 있습니다. 이 상한은 비용의 정확한 금액 상한이 아니므로 제공사 결제·사용량 설정도 운영자가 관리해야 합니다. `AI_DAILY_LIMIT`, `CLASS_AI_DAILY_LIMIT`, `OPENAI_MODEL`을 환경변수로 조정할 수 있습니다.
+공개 웹앱과 로컬 버전 모두 교사가 @goedu.kr 학교 Google 계정에서 발급한 Gemini API 키를 등록합니다. 공용 AI 연결은 제거되었습니다. 학생은 별도 키 없이 이용합니다. [교사 연결 안내](docs/TEACHER_AI_GUIDE.md)
 
 수업 생성은 교사당 하루 10개, 학급은 최대 300명입니다. 수업 코드와 비밀번호를 공개 게시판에 올리지 마세요. 가입을 제한하려면 `TEACHER_INVITE_CODE`를 서버 비밀값으로 설정합니다. 학생은 실명 대신 별명을 사용하고 사진 속 개인정보를 가립니다. 학기 종료 후 교사는 필요한 기록을 내려받고 수업을 삭제할 수 있습니다. 별도의 운영자 관리자 화면, 이메일 전송·복구, 기관 SSO, 학부모 공개 게시판, 자동 보관기간 삭제 기능은 포함하지 않았습니다.
 
 첨부 수업안의 1차시 탐색·질문, 2차시 직접 초고·비판적 수정·공유 흐름을 네 화면으로 구성했습니다. 수업안의 외부 서비스 설명을 사실 보증으로 사용하지 않았으며, AI 결과는 오류가 있을 수 있습니다.
 
-공식 기술 문서: [OpenAI 이미지 입력](https://developers.openai.com/api/docs/guides/images-vision), [OpenAI 텍스트 생성](https://developers.openai.com/api/docs/guides/text), [Cloudflare 정적 자산과 Workers](https://developers.cloudflare.com/workers/static-assets/), [D1](https://developers.cloudflare.com/d1/get-started/), [GitHub Actions 배포](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/).
+공식 기술 문서: [Google Gemini API 키](https://ai.google.dev/gemini-api/docs/api-key), [Cloudflare 정적 자산과 Workers](https://developers.cloudflare.com/workers/static-assets/), [D1](https://developers.cloudflare.com/d1/get-started/), [GitHub Actions 배포](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/).

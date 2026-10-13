@@ -15,7 +15,7 @@ test("teacher personal AI credentials are encrypted, isolated, and never returne
     "PUT",
     {
       mode: "personal",
-      accountId: "a".repeat(32),
+      schoolEmail: "a@goedu.kr",
       token,
       consent: true,
       dailyLimit: 3,
@@ -40,7 +40,7 @@ test("teacher personal AI credentials are encrypted, isolated, and never returne
         "PUT",
         {
           mode: "personal",
-          accountId: "b".repeat(32),
+          schoolEmail: "b@goedu.kr",
           token: "",
           consent: true,
         },
@@ -51,7 +51,7 @@ test("teacher personal AI credentials are encrypted, isolated, and never returne
   );
   assert.equal(
     (await t.req("/teacher-ai", "DELETE", {}, a.cookie)).data.mode,
-    "shared",
+    "disabled",
   );
   assert.equal(t.db.prepare("SELECT count(*) n FROM teacher_ai").get().n, 0);
   t.db.close();
@@ -62,12 +62,12 @@ test("personal classroom routes analysis to its teacher account and enforces its
     a = await t.teacher(),
     c = await t.classroom(a.cookie),
     s = await t.student(c.code),
-    accountId = "a".repeat(32),
+    schoolEmail = "a@goedu.kr",
     token = "test-personal-token-1234567890";
   await t.req(
     "/teacher-ai",
     "PUT",
-    { mode: "personal", accountId, token, consent: true, dailyLimit: 1 },
+    { mode: "personal", schoolEmail, token, consent: true, dailyLimit: 1 },
     a.cookie,
   );
   await t.req("/work", "PUT", { career: "건축" }, s.cookie);
@@ -78,25 +78,18 @@ test("personal classroom routes analysis to its teacher account and enforces its
     count++;
     assert.equal(
       url,
-      `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/@cf/qwen/qwen3.8-27b`,
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
     );
-    assert.equal(init.headers.Authorization, `Bearer ${token}`);
+    assert.equal(init.headers["x-goog-api-key"], token);
     sent = JSON.parse(init.body);
-    return Response.json({
-      success: true,
-      result: {
-        choices: [
-          { message: { content: "주제 후보 3개" }, finish_reason: "stop" },
-        ],
-      },
-    });
+    return Response.json({candidates: [{finishReason: "STOP", content: {parts: [{text: "주제 후보 3개"}]}}]});
   };
   try {
     assert.equal(
       (await t.req("/ai", "POST", { action: "topics" }, s.cookie)).status,
       200,
     );
-    assert.match(sent.messages[1].content, /건축/);
+    assert.match(sent.contents[0].parts[0].text, /건축/);
     assert.equal(
       (await t.req("/ai", "POST", { action: "topics" }, s.cookie)).status,
       429,
@@ -130,7 +123,7 @@ test("personal provider failure never silently falls back to the shared provider
     "PUT",
     {
       mode: "personal",
-      accountId: "a".repeat(32),
+      schoolEmail: "a@goedu.kr",
       token: "test-personal-token-1234567890",
       consent: true,
     },
@@ -142,7 +135,7 @@ test("personal provider failure never silently falls back to the shared provider
   try {
     const r = await t.req("/ai", "POST", { action: "topics" }, s.cookie);
     assert.equal(r.status, 502);
-    assert.match(r.data.error, /토큰/);
+    assert.match(r.data.error, /키/);
     assert.equal(sharedCalls, 0);
   } finally {
     globalThis.fetch = original;
@@ -181,4 +174,21 @@ test("teacher disabling AI applies to students while writing remains available",
   );
   assert.equal(calls, 0);
   t.db.close();
+});
+
+ test("only school Google registration is allowed and unconfigured teachers cannot use shared AI", async () => {
+ const t=setup(), a=await t.teacher(), c=await t.classroom(a.cookie), st=await t.student(c.code);
+ let calls=0; t.env.AI={run:async()=>{calls++;return {response:"shared"}}}; t.env.OPENAI_API_KEY="must-not-use";
+ await t.req("/work","PUT",{career:"생태"},st.cookie);
+ assert.equal((await t.req("/ai","POST",{action:"topics"},st.cookie)).status,503);
+ for(const b of [{mode:"shared"},{mode:"personal",provider:"cloudflare"},{mode:"personal",schoolEmail:"teacher@gmail.com",consent:true,token:"test-google-api-key-123456789"}]) assert.equal((await t.req("/teacher-ai","PUT",b,a.cookie)).status,400);
+ assert.equal(calls,0); t.db.close();
+ });
+
+test("legacy Cloudflare connection is inactive without deleting stored credentials", async () => {
+ const t=setup(), a=await t.teacher();
+ t.db.prepare("INSERT INTO teacher_ai (teacher_id,mode,account_id,token_cipher,daily_limit,updated,provider,model) VALUES (?,?,?,?,?,?,?,?)").run(a.data.id || t.db.prepare("SELECT id FROM teachers").get().id,"personal","a".repeat(32),"legacy-encrypted-data",150,new Date().toISOString(),"cloudflare","gemini-3.5-flash-lite");
+ const r=await t.req("/teacher-ai","GET",{},a.cookie);
+ assert.equal(r.data.mode,"disabled"); assert.equal(r.data.available,false); assert.equal(r.data.configured,false);
+ assert.equal(t.db.prepare("SELECT token_cipher FROM teacher_ai").get().token_cipher,"legacy-encrypted-data"); t.db.close();
 });

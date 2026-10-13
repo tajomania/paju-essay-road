@@ -187,7 +187,7 @@ test("feedback requires confirmed student text and never silently simulates AI",
   assert.match(FEEDBACK_INSTRUCTIONS, /수정 과제/);
   t.db.close();
 });
-test("actual AI request shape uses Responses and persists feedback snapshot", async () => {
+test("Gemini request shape provides feedback and persists feedback snapshot", async () => {
   const t = setup(),
     a = await t.teacher(),
     c = await t.classroom(a.cookie),
@@ -198,31 +198,18 @@ test("actual AI request shape uses Responses and persists feedback snapshot", as
     { draft: "학생이 직접 작성한 글", career: "건축", ocrConfirmed: true },
     s.cookie,
   );
-  t.env.OPENAI_API_KEY = "test-key";
+  await t.req("/teacher-ai", "PUT", {mode:"personal", schoolEmail:"teacher@goedu.kr", token:"test-google-api-key-123456789", consent:true}, a.cookie);
   const original = globalThis.fetch;
   let sent;
   globalThis.fetch = async (url, init) => {
-    assert.equal(url, "https://api.openai.com/v1/responses");
+    assert.match(url, /^https:\/\/generativelanguage.googleapis.com\//);
     sent = JSON.parse(init.body);
-    return Response.json({
-      status: "completed",
-      output: [
-        {
-          content: [
-            {
-              type: "output_text",
-              text: "강점: 질문이 구체적입니다. 수정 과제: 근거를 확인하세요.",
-            },
-          ],
-        },
-      ],
-    });
+    return Response.json({candidates:[{finishReason:"STOP",content:{parts:[{text:"강점: 질문이 구체적입니다. 수정 과제: 근거를 확인하세요."}]}}]});
   };
   try {
     const r = await t.req("/ai", "POST", { action: "feedback" }, s.cookie);
     assert.equal(r.status, 200);
-    assert.equal(sent.store, false);
-    assert.match(sent.instructions, /전문가 관점/);
+    assert.match(sent.systemInstruction.parts[0].text, /전문가 관점/);
     const w = await t.req("/work", "GET", {}, s.cookie);
     assert.equal(w.data.feedback[0].draft, "학생이 직접 작성한 글");
   } finally {
@@ -303,33 +290,11 @@ test("AI disabled flag blocks transmission even when a provider is available", a
   t.db.close();
 });
 
-test("Cloudflare binding maps photo inputs and returns text without a provider key", async () => {
-  const t = setup(),
-    a = await t.teacher(),
-    c = await t.classroom(a.cookie),
-    s = await t.student(c.code);
-  let sent;
-  t.env.AI = {
-    run: async (model, input) => {
-      sent = input;
-      return {
-        choices: [
-          { message: { content: "사진 속 학생의 글" }, finish_reason: "stop" },
-        ],
-      };
-    },
-  };
-  const image = "data:image/jpeg;base64,YQ==";
-  const r = await t.req(
-    "/ai",
-    "POST",
-    { action: "ocr", images: [image] },
-    s.cookie,
-  );
-  assert.equal(r.status, 200);
-  assert.equal(r.data.text, "사진 속 학생의 글");
-  assert.equal(sent.messages[1].content[1].image_url.url, image);
-  assert.equal(sent.store, false);
-  assert.equal(sent.chat_template_kwargs.enable_thinking, false);
-  t.db.close();
+test("Gemini photo recognition routes to registered teacher key", async () => {
+ const t=setup(), a=await t.teacher(), c=await t.classroom(a.cookie), st=await t.student(c.code);
+ await t.req("/teacher-ai","PUT",{mode:"personal",schoolEmail:"teacher@goedu.kr",token:"test-google-api-key-123456789",consent:true},a.cookie);
+ const original=globalThis.fetch; let sent;
+ globalThis.fetch=async(url,init)=>{sent=JSON.parse(init.body);return Response.json({candidates:[{finishReason:"STOP",content:{parts:[{text:"사진 속 학생의 글"}]}}]})};
+ try {const r=await t.req("/ai","POST",{action:"ocr",images:["data:image/jpeg;base64,YQ=="]},st.cookie);assert.equal(r.status,200);assert.equal(r.data.text,"사진 속 학생의 글");assert.equal(sent.contents[0].parts[1].inlineData.data,"YQ==");}
+ finally {globalThis.fetch=original;t.db.close();}
 });

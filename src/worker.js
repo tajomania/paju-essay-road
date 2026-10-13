@@ -156,7 +156,7 @@ const teacher = (s) => {
 async function ai(env, instructions, input, max = 1600) {
   if (env.AI_ENABLED !== "true")
     fail(503, "AI 연결이 비활성화되어 있습니다. 운영자에게 문의해 주세요.");
-  if (!env.OPENAI_API_KEY && env.AI) {
+  if (env.PERSONAL_AI_TEACHER_ID && env.AI) {
     const messages = [{ role: "system", content: instructions }];
     if (typeof input === "string")
       messages.push({ role: "user", content: input });
@@ -173,7 +173,7 @@ async function ai(env, instructions, input, max = 1600) {
     let result;
     try {
       result = await env.AI.run(
-        env.CLOUDFLARE_AI_MODEL || "@cf/qwen/qwen3.8-27b",
+        "google-gemini",
         {
           messages,
           max_completion_tokens: max,
@@ -186,7 +186,7 @@ async function ai(env, instructions, input, max = 1600) {
       if (error.status) throw error;
       fail(
         502,
-        "AI 분석을 완료하지 못했습니다. 잠시 후 다시 시도해 주세요. 운영자는 Cloudflare AI의 이용 한도를 확인해 주세요.",
+        "AI 분석을 완료하지 못했습니다. 잠시 후 다시 시도해 주세요. 교사는 Google API 이용 한도를 확인해 주세요.",
       );
     }
     const choice = result.choices?.[0];
@@ -200,47 +200,11 @@ async function ai(env, instructions, input, max = 1600) {
       );
     return output;
   }
-  if (!env.OPENAI_API_KEY)
-    fail(
-      503,
-      "운영자의 AI 연결 설정이 필요합니다. 직접 쓰기와 공유 기능은 사용할 수 있습니다.",
-    );
-  const r = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${env.OPENAI_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: env.OPENAI_MODEL || "gpt-4.1-mini",
-      instructions,
-      input,
-      max_output_tokens: max,
-      store: false,
-    }),
-    signal: AbortSignal.timeout(90000),
-  });
-  if (!r.ok)
-    fail(
-      502,
-      "AI 연결에 실패했습니다. 운영자가 API 설정과 사용 한도를 확인해야 합니다.",
-    );
-  const d = await r.json();
-  const out = (d.output || [])
-    .flatMap((v) => v.content || [])
-    .filter((v) => v.type === "output_text")
-    .map((v) => v.text)
-    .join("\n");
-  if (!out || d.status === "incomplete")
-    fail(
-      502,
-      "AI 응답이 완성되지 않았습니다. 글의 분량을 줄여 다시 시도해 주세요.",
-    );
-  return out;
+  fail(503, "교사가 학교 Google Gemini API를 등록해야 합니다. 직접 쓰기와 공유 기능은 사용할 수 있습니다.");
 }
 async function aiBudget(env, s, classId) {
-  if (env.AI_ENABLED !== "true" || (!env.OPENAI_API_KEY && !env.AI))
-    fail(503, "운영자의 AI 연결 설정이 필요합니다.");
+  if (env.AI_ENABLED !== "true" || (!env.PERSONAL_AI_TEACHER_ID || !env.AI))
+    fail(503, "교사가 학교 Google Gemini API를 등록해야 합니다.");
   await budget(env.DB, `ai:${s.actor_id}`, s.role === "student" ? 12 : 30);
   await budget(
     env.DB,
@@ -313,7 +277,7 @@ async function handle(request, env) {
       ok: true,
       app: "paju-essay-road",
       local: !!env.LOCAL_MODE,
-      ai: !!(env.AI_ENABLED === "true" && (env.OPENAI_API_KEY || env.AI)),
+      ai: !!(env.AI_ENABLED === "true" && env.PERSONAL_AI_TEACHER_ID && env.AI),
     });
   if (p.startsWith("/api/auth/") && method === "POST") {
     await budget(
@@ -453,15 +417,12 @@ async function handle(request, env) {
     }
     if (p === "/api/teacher-ai" && method === "PUT") {
       const b = await body(request, 5000);
-      const provider = b.provider || "cloudflare";
-      if (!["google", "cloudflare"].includes(provider))
-        fail(400, "AI 서비스를 선택하세요.");
-      if (provider === "google" && !env.LOCAL_MODE)
-        fail(403, "학교 Google 계정 연결은 로컬 설치 버전에서 사용하세요.");
+      const provider = b.provider || "google";
+      if (provider !== "google") fail(400, "goedu.kr 학교 Google Gemini API만 등록할 수 있습니다.");
       const model = text(b.model || "gemini-3.5-flash-lite", 90);
       if (!/^gemini-[a-z0-9.-]+$/.test(model))
         fail(400, "Gemini 모델 이름을 확인하세요.");
-      if (!["shared", "personal", "disabled"].includes(b.mode))
+      if (!["personal", "disabled"].includes(b.mode))
         fail(400, "AI 이용 방식을 선택해 주세요.");
       let accountId = "",
         cipher = "";
@@ -471,16 +432,13 @@ async function handle(request, env) {
       if (b.mode === "personal") {
         if (b.consent !== true)
           fail(400, "선택한 외부 AI로 전송되는 자료 안내를 확인해 주세요.");
-        accountId =
-          provider === "google"
-            ? ""
-            : required(b.accountId || old?.account_id || "", 32).toLowerCase();
-        if (provider === "cloudflare" && !/^[a-f0-9]{32}$/.test(accountId))
-          fail(400, "Account ID는 32자리 영문·숫자 값을 입력하세요.");
+        accountId = required(b.schoolEmail || "", 200).toLowerCase();
+        if (!/^[^@\s]+@goedu\.kr$/.test(accountId))
+          fail(400, "goedu.kr 학교 Google 이메일을 입력하세요.");
         const token = text(b.token || "", 2000);
         if (token) {
           if (token.length < 20 || /\s/.test(token))
-            fail(400, "API 토큰을 확인해 주세요.");
+            fail(400, "Gemini API 키을 확인해 주세요.");
           cipher = await encryptToken(env, s.actor_id, token);
         } else if (
           old?.token_cipher &&
@@ -488,7 +446,7 @@ async function handle(request, env) {
           (old.provider || "cloudflare") === provider
         )
           cipher = old.token_cipher;
-        else fail(400, "새 계정의 API 토큰을 입력해 주세요.");
+        else fail(400, "새 계정의 Gemini API 키을 입력해 주세요.");
       }
       await run(
         env.DB,

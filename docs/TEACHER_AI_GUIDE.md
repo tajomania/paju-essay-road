@@ -1,39 +1,28 @@
-# 교사용 AI 연결 안내
+# 교사용 학교 Google API 연결 안내
 
-웹앱 주소: https://paju-essay-road.essay-road.workers.dev
+공개 웹앱과 Windows 로컬 버전 모두 **goedu.kr 학교 Google 계정에서 발급한 Gemini API 키**를 등록해 이용합니다. 공용 AI와 개인 Cloudflare AI 연결은 제공하지 않습니다. 기존 연결은 비활성화되므로 새로 등록하세요. 학생은 주소와 참여 코드만 사용합니다.
 
-화면 안내문: https://paju-essay-road.essay-road.workers.dev/ai-guide.html
+## 등록 절차
 
-## 시작하기
+1. [Google AI Studio](https://aistudio.google.com/api-keys)에 자신의 **@goedu.kr 학교 Google 계정**으로 로그인합니다.
+2. 학교 계정의 프로젝트에서 Gemini API 키를 발급합니다.
+3. 웹앱에서 교사 로그인 후 **내 AI 연결**을 누릅니다.
+4. **goedu.kr 학교 Google API 등록**을 선택하고 학교 이메일·API 키·모델 이름을 입력합니다. 기본 모델은 `gemini-3.5-flash-lite`입니다.
+5. 하루 요청 한도와 전송 자료 안내를 확인하고 **설정 저장**을 누릅니다.
+6. **저장된 연결 테스트**가 성공하는지 확인한 뒤 학생에게 수업 링크를 공유합니다.
 
-교사로 로그인하고 **내 AI 연결**을 누릅니다. 설정은 해당 교사의 모든 수업에 적용됩니다. 학생은 별도 키 없이 참여 링크와 수업 코드로 이용합니다.
+일반 Gemini 웹 로그인과 API 사용 권한은 별개입니다. 학교 관리자가 AI Studio·프로젝트·API 키 발급을 제한할 수 있습니다. [Google 공식 계정 안내](https://ai.google.dev/gemini-api/docs/workspace), [API 키 안내](https://ai.google.dev/gemini-api/docs/api-key).
 
-- 공용 Cloudflare AI: 운영자의 공용 한도 내에서 키 없이 이용합니다.
-- 내 Cloudflare 계정: 자신의 Account ID·Workers AI API 토큰을 저장합니다. 자신의 계정 이용량으로 분석합니다.
-- AI 사용 끄기: 직접 읽기·쓰기·공유 활동은 계속 가능합니다.
+앱은 입력 이메일의 `@goedu.kr` 형식을 확인합니다. Google OAuth 로그인이나 학교 계정 소유 인증을 제공하지 않으며, API 키만으로 발급 계정을 확인할 수 없습니다. AI Studio에서 발급 계정을 직접 확인하세요.
 
-## 개인 Cloudflare 연결
+## 저장과 학생 자료
 
-1. Cloudflare 가입과 이메일 인증을 완료합니다.
-2. 대시보드의 Workers AI → Use REST API를 엽니다.
-3. Create a Workers AI API Token에서 토큰을 생성하고 복사합니다.
-4. Get Account ID에서 Account ID를 복사합니다.
-5. 웹앱의 내 AI 연결에서 개인 계정 방식을 선택하고 두 값을 입력합니다.
-6. 하루 요청 한도와 자료 전송 안내를 확인하고 저장합니다.
-7. 저장된 연결 테스트를 눌러 성공을 확인합니다. 테스트는 학생 글을 사용하지 않습니다.
+키는 로컬 버전에서는 교사 PC, 공개 버전에서는 웹앱 서버에 암호화해 저장합니다. 학생과 다른 교사는 키 원문을 볼 수 없습니다. 로컬 설정 변경은 교사 PC의 localhost 화면에서만 가능합니다. 이메일은 교사 AI 설정에만 사용하며 학생에게 표시하지 않습니다.
 
-수동 토큰 설정에는 Workers AI - Read와 Workers AI - Edit 권한이 필요합니다. [Cloudflare 공식 안내](https://developers.cloudflare.com/workers-ai/get-started/rest-api/)를 참고하세요. 토큰은 서버에 암호화해 저장하고 원문을 다시 표시하지 않습니다. 다른 교사·학생과 공유하거나 공개 문서에 올리지 마세요.
+AI 요청 시 공통 읽기 자료·희망 분야·에세이 초안·사진이 **Google Gemini API**로 전송됩니다. 사진 원본은 앱 서버에 보관하지 않습니다. 학생이 직접 쓴 글에 피드백을 제공하며 에세이를 대신 작성하는 기능은 제공하지 않습니다.
 
-## 학생에게 안내할 내용
+학교 API 계정의 이용량·결제 정책이 적용됩니다. 앱의 요청 한도는 금액 한도가 아닙니다. 연결 실패 시 다른 AI로 자동 전환하지 않습니다. 연결 삭제 또는 AI 사용 끄기는 저장된 키를 삭제하며, Google에서 키를 폐기하려면 AI Studio에서도 처리하세요. 실제 학교 계정 연결은 해당 교사의 키로 테스트해야 확인할 수 있습니다.
 
-분석할 때 공통 읽기 자료·희망 분야·에세이 초안·사진이 Cloudflare Workers AI로 전송됩니다. 사진 원본은 앱 서버에 보관하지 않으며, 인식 결과·글쓰기 기록·피드백은 수업 기록으로 저장합니다. 학생은 초안 글자를 확인하고 AI의 제안을 자신의 근거에 따라 수용하거나 거절합니다. AI는 에세이를 대신 쓰는 기능으로 제공하지 않습니다.
+## 로컬 설치
 
-## 비용·문제 해결·해제
-
-개인 계정은 해당 교사의 Cloudflare 이용량과 결제 정책이 적용됩니다. 요청 한도는 금액 한도가 아니며 실제 비용은 제공사에서 확인합니다. 개인 연결 실패 시 공용 계정으로 자동 전환하지 않습니다.
-
-인증 오류는 계정과 토큰 권한을 확인하고, 한도 오류는 계정 이용량을 확인합니다. 사진 인식 오류는 선명한 사진을 다시 등록하거나 텍스트를 직접 수정합니다. 개인 연결 삭제 또는 공용 전환은 저장된 개인 토큰을 삭제합니다. 토큰 폐기가 필요하면 Cloudflare에서도 처리하세요.
-
-## 학교 Google 계정과 로컬 컴퓨터
-
-학교 Google 계정의 Gemini API 키를 사용하려면 Windows 로컬 실행 패키지를 설치하고 [로컬 설치 안내](LOCAL_GOOGLE_GUIDE.md)를 따릅니다. 공개 웹앱의 Google 연결은 허용하지 않고 로컬 버전에서만 키를 설정합니다.
+[Windows 패키지](https://github.com/tajomania/paju-essay-road/releases/download/v1.1.1/Paju-Essay-Road-Windows.zip)를 전체 압축 해제하고 **Start-Classroom.cmd**를 실행하세요. 자세한 설치와 학생 학교망 접속 방법은 [로컬 설치 안내](LOCAL_GOOGLE_GUIDE.md)를 따릅니다. 로컬 학생 접속용 학교망 IP 주소는 AI 제공사 연결과 별개이며 계속 필요합니다.

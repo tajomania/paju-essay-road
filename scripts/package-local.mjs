@@ -26,7 +26,7 @@ fs.writeFileSync(
   JSON.stringify(
     {
       name: "paju-essay-road-local",
-      version: "1.1.0",
+      version: "1.1.1",
       private: true,
       type: "module",
     },

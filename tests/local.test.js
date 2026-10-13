@@ -61,17 +61,18 @@ test("local installation serves UI, persists classes, and keeps credentials out 
   }
 });
 
-test("school Gemini connection is local-only and remote clients cannot change keys", async () => {
+test("school Gemini works hosted and locally while remote local clients cannot change keys", async () => {
   const t = setup(),
     a = await t.teacher(),
     body = {
       mode: "personal",
       provider: "google",
+      schoolEmail: "teacher@goedu.kr",
       token: "test-google-api-key-123456789",
       model: "gemini-3.5-flash-lite",
       consent: true,
     };
-  assert.equal((await t.req("/teacher-ai", "PUT", body, a.cookie)).status, 403);
+  assert.equal((await t.req("/teacher-ai", "PUT", body, a.cookie)).status, 200);
   t.env.LOCAL_MODE = true;
   t.env.LOCAL_IS_LOOPBACK = false;
   assert.equal((await t.req("/teacher-ai", "PUT", body, a.cookie)).status, 403);

@@ -3,7 +3,7 @@
 
 현재 GitHub 저장소: https://github.com/tajomania/paju-essay-road
 
-현재 Cloudflare Workers AI가 활성화되어 있습니다. 교사는 내 AI 연결에서 공용 AI, 개인 Cloudflare 계정, AI 사용 끄기를 선택할 수 있습니다. 학생은 별도 API 키 없이 이용합니다.
+AI는 교사별 goedu.kr 학교 Google Gemini API 등록으로만 이용합니다. Cloudflare는 앱과 데이터 저장 서버로 사용합니다.
 
 
 배포 운영자만 이 설정을 수행합니다. 다른 교사와 학생은 완성된 웹앱 주소로 접속합니다. 이 문서는 현재 배포 완료를 뜻하지 않으며, 실제 배포 URL은 GitHub Actions/Cloudflare가 성공한 뒤 확인합니다.
@@ -12,7 +12,7 @@
 
 - GitHub: 소스 저장소 및 자동 배포
 - Cloudflare: 웹앱 서버와 D1 데이터베이스
-- AI: Cloudflare Workers AI 내장 연결 또는 선택적으로 OpenAI API. 제공사 이용량 한도와 비용 정책을 확인합니다.
+- AI: 교사별 학교 Google Gemini API. 제공사 이용량 한도와 비용 정책을 확인합니다.
 
 일반 ChatGPT 구독만으로 API 연결이 완료되지는 않습니다. 운영자는 API 키를 서버 비밀값으로 설정합니다. 학생과 수업을 배포받는 교사에게는 키를 요구하지 않습니다.
 
@@ -34,7 +34,7 @@ gh repo create paju-essay-road --public --source=. --remote=origin --push
 
 ## 3. Cloudflare에 데이터베이스 생성
 
-Cloudflare 대시보드의 **Storage & databases → D1**에서 `essay-road` 데이터베이스를 만듭니다. 생성 후 Database ID(UUID)를 복사합니다. `wrangler.jsonc`의 0으로 된 ID는 로컬 실행용 임시값이며 실제 데이터베이스가 아닙니다.
+Cloudflare 대시보드의 **Storage & databases → D1**에서 `essay-road` 데이터베이스를 만듭니다. 생성 후 Database ID(UUID)를 복사합니다. 새 운영 환경은 `wrangler.jsonc`의 database_id를 자신의 데이터베이스 ID로 교체합니다.
 
 Cloudflare Account ID를 확인하고, API Token을 만듭니다. 해당 계정의 **Workers Scripts: Edit**, **D1: Edit**, **Account Settings: Read** 권한을 사용합니다. 가능한 해당 계정으로 범위를 제한합니다. 토큰은 채팅이나 소스 파일에 적지 않습니다.
 
@@ -56,19 +56,7 @@ Cloudflare Account ID를 확인하고, API Token을 만듭니다. 해당 계정�
 
 ## 5. 승인 후 AI 연결 활성화
 
-학생의 읽기 자료·관심 분야·초안·사진을 Cloudflare Workers AI로 전송하는 운영 방식이 승인되어 AI_ENABLED=true와 AI 바인딩으로 활성화했습니다.
-
-Cloudflare 내장 AI를 사용할 때는 wrangler.jsonc에 ai: {binding: "AI"}를 추가하고 vars의 AI_ENABLED를 "true", CLOUDFLARE_AI_MODEL을 "@cf/qwen/qwen3.8-27b"로 설정해 배포합니다. 키 입력은 필요 없지만 Workers AI 사용량과 계정 한도가 적용됩니다.
-
-OpenAI를 사용할 경우 첫 배포 성공 후 Cloudflare의 생성된 Worker → **Settings → Variables and Secrets**에 다음 값을 추가합니다.
-
-| 이름 | 형식 | 설명 |
-|---|---|---|
-| `OPENAI_API_KEY` | Secret, OpenAI 사용 시 | 운영자 OpenAI API 키 |
-| `AI_ENABLED` | 변수 | 승인 이후에만 true |
-| `TEACHER_INVITE_CODE` | Secret, 선택 | 설정하면 교사 가입 시 초대 코드 필요 |
-
-Cloudflare에서 비밀값을 저장하고 새 배포에 적용합니다. 키는 GitHub에 커밋하지 않습니다. `OPENAI_MODEL` 기본값은 `gpt-4.1-mini`이며 운영자의 API 계정에서 사용 가능한 이미지 입력 모델로 조정할 수 있습니다. `store:false` 요청을 사용하지만 제공사의 데이터 처리 정책은 별도로 적용됩니다.
+교사별 Gemini API 키를 암호화할 `AI_KEY_ENCRYPTION_SECRET`을 Worker Secret으로 설정합니다. 충분히 긴 난수를 사용하고 소스에 커밋하지 않습니다. 기존 운영 환경의 암호화 비밀값을 교체하지 마세요. `AI_ENABLED=true`로 등록 기능을 활성화합니다. 운영자 공용 키 또는 AI 바인딩은 사용하지 않습니다. 교사가 앱에서 학교 이메일·Gemini API 키를 등록하고 연결 테스트를 수행합니다. 상세 절차는 [교사 안내](TEACHER_AI_GUIDE.md)를 따릅니다.
 
 ## 6. 배포 결과 확인
 

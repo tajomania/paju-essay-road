@@ -25,8 +25,12 @@ AI 요청 시 공통 읽기 자료·희망 분야·에세이 초안·사진이 *
 
 ## 로컬 설치
 
-[Windows 패키지](https://github.com/tajomania/paju-essay-road/releases/download/v1.1.2/Paju-Essay-Road-Windows.zip)를 전체 압축 해제하고 **Start-Classroom.cmd**를 실행하세요. 자세한 설치와 학생 학교망 접속 방법은 [로컬 설치 안내](LOCAL_GOOGLE_GUIDE.md)를 따릅니다. 로컬 학생 접속용 학교망 IP 주소는 AI 제공사 연결과 별개이며 계속 필요합니다.
+[Windows 패키지](https://github.com/tajomania/paju-essay-road/releases/download/v1.1.3/Paju-Essay-Road-Windows.zip)를 전체 압축 해제하고 **Start-Classroom.cmd**를 실행하세요. 자세한 설치와 학생 학교망 접속 방법은 [로컬 설치 안내](LOCAL_GOOGLE_GUIDE.md)를 따릅니다. 로컬 학생 접속용 학교망 IP 주소는 AI 제공사 연결과 별개이며 계속 필요합니다.
 
 ## 자료 전송 동의 오류 해결
 
 ‘자료 전송 동의의 [필수] 체크박스를 선택’ 또는 ‘선택한 외부 AI로 전송되는 자료 안내를 확인’이라는 문구는 Google 연결 오류가 아니라 설정 저장 전에 동의가 빠진 상태입니다. 내 AI 연결에서 전송되는 자료 안내를 읽고 [필수] 체크박스를 직접 선택한 뒤 설정 저장을 누릅니다. ‘API 키가 저장되었습니다’ 안내 후 저장된 연결 테스트를 실행하세요. 체크되지 않은 상태에서는 API 키를 저장하지 않습니다. 새 키를 입력했을 때도 저장을 먼저 완료하세요.
+
+## Google API 일시 오류
+
+Google HTTP 503 · TEMPORARY_UNAVAILABLE은 Google 서비스의 일시 오류입니다. 앱은 최대 2회 자동 재시도합니다. 계속 실패하면 잠시 후 다시 테스트하세요. 이 오류만으로 API 키를 다시 발급할 필요는 없습니다. KEY_INVALID는 키 확인, PERMISSION은 프로젝트 권한, BILLING은 결제·무료 이용 조건, QUOTA는 한도 확인이 필요합니다. 계정 설정 오류는 자동 재시도하지 않습니다.

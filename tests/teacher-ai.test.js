@@ -78,7 +78,7 @@ test("personal classroom routes analysis to its teacher account and enforces its
     count++;
     assert.equal(
       url,
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent",
     );
     assert.equal(init.headers["x-goog-api-key"], token);
     sent = JSON.parse(init.body);
@@ -187,7 +187,7 @@ test("teacher disabling AI applies to students while writing remains available",
 
 test("legacy Cloudflare connection is inactive without deleting stored credentials", async () => {
  const t=setup(), a=await t.teacher();
- t.db.prepare("INSERT INTO teacher_ai (teacher_id,mode,account_id,token_cipher,daily_limit,updated,provider,model) VALUES (?,?,?,?,?,?,?,?)").run(a.data.id || t.db.prepare("SELECT id FROM teachers").get().id,"personal","a".repeat(32),"legacy-encrypted-data",150,new Date().toISOString(),"cloudflare","gemini-3.5-flash-lite");
+ t.db.prepare("INSERT INTO teacher_ai (teacher_id,mode,account_id,token_cipher,daily_limit,updated,provider,model) VALUES (?,?,?,?,?,?,?,?)").run(a.data.id || t.db.prepare("SELECT id FROM teachers").get().id,"personal","a".repeat(32),"legacy-encrypted-data",150,new Date().toISOString(),"cloudflare","gemini-3.1-flash-lite");
  const r=await t.req("/teacher-ai","GET",{},a.cookie);
  assert.equal(r.data.mode,"disabled"); assert.equal(r.data.available,false); assert.equal(r.data.configured,false);
  assert.equal(t.db.prepare("SELECT token_cipher FROM teacher_ai").get().token_cipher,"legacy-encrypted-data"); t.db.close();

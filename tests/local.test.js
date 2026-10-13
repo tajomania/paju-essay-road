@@ -69,7 +69,7 @@ test("school Gemini works hosted and locally while remote local clients cannot c
       provider: "google",
       schoolEmail: "teacher@goedu.kr",
       token: "test-google-api-key-123456789",
-      model: "gemini-3.5-flash-lite",
+      model: "gemini-3.1-flash-lite",
       consent: true,
     };
   assert.equal((await t.req("/teacher-ai", "PUT", body, a.cookie)).status, 200);
@@ -90,7 +90,7 @@ test("Gemini adapter sends source, feedback instructions and inline photos and o
   globalThis.fetch = async (url, init) => {
     assert.equal(
       url,
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent",
     );
     assert.equal(init.headers["x-goog-api-key"], "test-key");
     sent = JSON.parse(init.body);
@@ -109,7 +109,7 @@ test("Gemini adapter sends source, feedback instructions and inline photos and o
     });
   };
   try {
-    const r = await runGemini("test-key", "gemini-3.5-flash-lite", {
+    const r = await runGemini("test-key", "gemini-3.1-flash-lite", {
       max_completion_tokens: 1600,
       messages: [
         { role: "system", content: "대신 쓰지 않고 피드백한다." },

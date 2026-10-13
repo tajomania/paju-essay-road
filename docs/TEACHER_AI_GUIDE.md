@@ -7,7 +7,7 @@
 1. [Google AI Studio](https://aistudio.google.com/api-keys)에 자신의 **@goedu.kr 학교 Google 계정**으로 로그인합니다.
 2. 학교 계정의 프로젝트에서 Gemini API 키를 발급합니다.
 3. 웹앱에서 교사 로그인 후 **내 AI 연결**을 누릅니다.
-4. **goedu.kr 학교 Google API 등록**을 선택하고 학교 이메일·API 키·모델 이름을 입력합니다. 기본 모델은 `gemini-3.5-flash-lite`입니다.
+4. **goedu.kr 학교 Google API 등록**을 선택하고 학교 이메일·API 키·모델 이름을 입력합니다. 기본 모델은 `gemini-3.1-flash-lite`입니다.
 5. 하루 요청 한도와 전송 자료 안내를 확인하고 **설정 저장**을 누릅니다.
 6. **저장된 연결 테스트**가 성공하는지 확인한 뒤 학생에게 수업 링크를 공유합니다.
 
@@ -25,7 +25,7 @@ AI 요청 시 공통 읽기 자료·희망 분야·에세이 초안·사진이 *
 
 ## 로컬 설치
 
-[Windows 패키지](https://github.com/tajomania/paju-essay-road/releases/download/v1.1.3/Paju-Essay-Road-Windows.zip)를 전체 압축 해제하고 **Start-Classroom.cmd**를 실행하세요. 자세한 설치와 학생 학교망 접속 방법은 [로컬 설치 안내](LOCAL_GOOGLE_GUIDE.md)를 따릅니다. 로컬 학생 접속용 학교망 IP 주소는 AI 제공사 연결과 별개이며 계속 필요합니다.
+[Windows 패키지](https://github.com/tajomania/paju-essay-road/releases/download/v1.1.4/Paju-Essay-Road-Windows.zip)를 전체 압축 해제하고 **Start-Classroom.cmd**를 실행하세요. 자세한 설치와 학생 학교망 접속 방법은 [로컬 설치 안내](LOCAL_GOOGLE_GUIDE.md)를 따릅니다. 로컬 학생 접속용 학교망 IP 주소는 AI 제공사 연결과 별개이며 계속 필요합니다.
 
 ## 자료 전송 동의 오류 해결
 
@@ -34,3 +34,7 @@ AI 요청 시 공통 읽기 자료·희망 분야·에세이 초안·사진이 *
 ## Google API 일시 오류
 
 Google HTTP 503 · TEMPORARY_UNAVAILABLE은 Google 서비스의 일시 오류입니다. 앱은 최대 2회 자동 재시도합니다. 계속 실패하면 잠시 후 다시 테스트하세요. 이 오류만으로 API 키를 다시 발급할 필요는 없습니다. KEY_INVALID는 키 확인, PERMISSION은 프로젝트 권한, BILLING은 결제·무료 이용 조건, QUOTA는 한도 확인이 필요합니다. 계정 설정 오류는 자동 재시도하지 않습니다.
+
+## 모델별 응답 지연 해결
+
+기존 gemini-3.5-flash-lite에서 503·응답 지연이 반복되고 다른 모델이 응답하는 사례를 확인했습니다. 내 AI 연결의 모델을 gemini-3.1-flash-lite로 변경하고 전송 동의 확인 → 설정 저장 → 연결 테스트를 실행하세요. API 키를 새로 발급할 필요는 없습니다. 모델별 서비스 상태와 계정 한도에 따라 결과는 달라질 수 있습니다. 앱이 다른 제공사나 다른 모델로 자동 전환하지 않습니다.

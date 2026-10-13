@@ -419,7 +419,7 @@ async function handle(request, env) {
       const b = await body(request, 5000);
       const provider = b.provider || "google";
       if (provider !== "google") fail(400, "goedu.kr 학교 Google Gemini API만 등록할 수 있습니다.");
-      const model = text(b.model || "gemini-3.5-flash-lite", 90);
+      const model = text(b.model || "gemini-3.1-flash-lite", 90);
       if (!/^gemini-[a-z0-9.-]+$/.test(model))
         fail(400, "Gemini 모델 이름을 확인하세요.");
       if (!["personal", "disabled"].includes(b.mode))

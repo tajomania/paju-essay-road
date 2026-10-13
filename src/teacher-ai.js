@@ -59,7 +59,7 @@ export function status(env, row) {
   return {
     mode: configured ? "personal" : "disabled", local: !!env.LOCAL_MODE,
     provider: "google", schoolEmail: configured ? row.account_id : "",
-    model: row?.model || "gemini-3.5-flash-lite", configured,
+    model: row?.model || "gemini-3.1-flash-lite", configured,
     dailyLimit: row?.daily_limit || 150, updated: row?.updated || null,
     personalAvailable: !!env.AI_KEY_ENCRYPTION_SECRET,
     available: env.AI_ENABLED === "true" && configured && !!env.AI_KEY_ENCRYPTION_SECRET,
@@ -73,6 +73,6 @@ export async function aiEnvironment(env, teacherId) {
   return {
     ...base, PERSONAL_AI_TEACHER_ID: teacherId,
     PERSONAL_AI_DAILY_LIMIT: row.daily_limit,
-    AI: { run: (_model, input) => runGemini(token, row.model || "gemini-3.5-flash-lite", input) },
+    AI: { run: (_model, input) => runGemini(token, row.model || "gemini-3.1-flash-lite", input) },
   };
 }

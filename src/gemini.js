@@ -70,7 +70,7 @@ export async function runGemini(token, model, input) {
             maxOutputTokens: (input.max_completion_tokens || 1600) + 2048,
           },
         }),
-        signal: AbortSignal.timeout((input.max_completion_tokens || 1600) <= 60 ? 15000 : 60000),
+        signal: AbortSignal.timeout((input.max_completion_tokens || 1600) <= 60 ? 30000 : 60000),
       },
     );
     if (![408, 500, 502, 503, 504].includes(response.status) || attempt === 2) break;

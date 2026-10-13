@@ -10,7 +10,7 @@
 
 ## 교사 PC에 설치하고 학교 Google 계정 사용
 
-[Windows 실행 패키지](https://github.com/tajomania/paju-essay-road/releases/download/v1.1.3/Paju-Essay-Road-Windows.zip)를 내려받아 전체 압축을 풀고 Start-Classroom.cmd를 실행합니다. 별도 Node.js 설치 없이 시작합니다. 내 AI 연결에서 학교 Google 계정으로 AI Studio에 로그인해 발급한 Gemini API 키를 연결합니다. 계정의 AI Studio·프로젝트 권한은 학교 관리자 정책에 따라 제한될 수 있습니다. 이 방식은 Google OAuth 로그인 버튼이 아니라 학교 계정 발급 API 키 연결입니다.
+[Windows 실행 패키지](https://github.com/tajomania/paju-essay-road/releases/download/v1.1.4/Paju-Essay-Road-Windows.zip)를 내려받아 전체 압축을 풀고 Start-Classroom.cmd를 실행합니다. 별도 Node.js 설치 없이 시작합니다. 내 AI 연결에서 학교 Google 계정으로 AI Studio에 로그인해 발급한 Gemini API 키를 연결합니다. 계정의 AI Studio·프로젝트 권한은 학교 관리자 정책에 따라 제한될 수 있습니다. 이 방식은 Google OAuth 로그인 버튼이 아니라 학교 계정 발급 API 키 연결입니다.
 
 학생은 같은 학교망에서 교사 PC의 참여 링크로 이용합니다. 로컬 기록과 암호화된 키는 교사 PC에 저장하며 공개 서버와 별개입니다. Gemini 분석은 Google API로 전송되므로 인터넷이 필요합니다.
 

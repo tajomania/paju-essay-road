@@ -1,3 +1,4 @@
+import { exportRecordsXlsx } from "./export-xlsx.js";
 const $ = (s) => document.querySelector(s),
   app = $("#app");
 const esc = (v) =>
@@ -589,7 +590,7 @@ async function openClass(id) {
 }
 async function teacherScreen() {
   const c = state.class;
-  app.innerHTML = `<button id="all-classes" class="text-button">← 내 수업 목록</button><div class="workspace-header"><div><span class="eyebrow">CLASSROOM MANAGEMENT</span><h1>${esc(c.title)}</h1><p>참여 코드 <span class="code">${esc(c.code)}</span> · ${c.active ? "수업 진행 중" : "종료된 수업"}</p></div><div class="actions"><button id="my-ai-settings" class="secondary">내 AI 연결</button><button id="copy-link" class="secondary">학생 참여 링크 복사</button><button id="export" class="secondary">기록 내려받기</button></div></div><nav class="tabs teacher-tabs"><button data-tab="material" class="${state.tab === "material" ? "active" : ""}">공통 자료 준비</button><button data-tab="students" class="${state.tab === "students" ? "active" : ""}">학생 진행 현황</button><button data-tab="board" class="${state.tab === "board" ? "active" : ""}">에세이 · 댓글</button><button data-tab="settings" class="${state.tab === "settings" ? "active" : ""}">수업 관리</button></nav><div id="teacher-content"></div>`;
+  app.innerHTML = `<button id="all-classes" class="text-button">← 내 수업 목록</button><div class="workspace-header"><div><span class="eyebrow">CLASSROOM MANAGEMENT</span><h1>${esc(c.title)}</h1><p>참여 코드 <span class="code">${esc(c.code)}</span> · ${c.active ? "수업 진행 중" : "종료된 수업"}</p></div><div class="actions"><button id="my-ai-settings" class="secondary">내 AI 연결</button><button id="copy-link" class="secondary">학생 참여 링크 복사</button><button id="export" class="secondary">활동 기록 Excel 다운로드</button></div></div><nav class="tabs teacher-tabs"><button data-tab="material" class="${state.tab === "material" ? "active" : ""}">공통 자료 준비</button><button data-tab="students" class="${state.tab === "students" ? "active" : ""}">학생 진행 현황</button><button data-tab="board" class="${state.tab === "board" ? "active" : ""}">에세이 · 댓글</button><button data-tab="settings" class="${state.tab === "settings" ? "active" : ""}">수업 관리</button></nav><div id="teacher-content"></div>`;
   $("#all-classes").onclick = () => loadMe();
   $("#my-ai-settings").onclick = teacherAiSettings;
   $("#copy-link").onclick = async () => {
@@ -605,15 +606,16 @@ async function teacherScreen() {
   };
   $("#export").onclick = (e) =>
     busy(e.currentTarget, async () => {
-      const d = await api(`/classes/${c.id}/export`);
-      const blob = new Blob([JSON.stringify(d, null, 2)], {
-        type: "application/json",
+      const record = await api(`/classes/${c.id}/export`);
+      const blob = new Blob([exportRecordsXlsx(record)], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = `essay-road-${c.code}.json`;
+      a.download = `학생활동기록-${c.code}.xlsx`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      toast("Excel 기록을 내려받았습니다. 파일은 편집 가능하며 웹앱에 자동 반영되지는 않습니다.");
     });
   on("[data-tab]", "click", (e) => {
     state.tab = e.currentTarget.dataset.tab;

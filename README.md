@@ -10,7 +10,7 @@
 
 ## 교사 PC에 설치하고 학교 Google 계정 사용
 
-[Windows 실행 패키지](https://github.com/tajomania/paju-essay-road/releases/download/v1.1.4/Paju-Essay-Road-Windows.zip)를 내려받아 전체 압축을 풀고 Start-Classroom.cmd를 실행합니다. 별도 Node.js 설치 없이 시작합니다. 내 AI 연결에서 학교 Google 계정으로 AI Studio에 로그인해 발급한 Gemini API 키를 연결합니다. 계정의 AI Studio·프로젝트 권한은 학교 관리자 정책에 따라 제한될 수 있습니다. 이 방식은 Google OAuth 로그인 버튼이 아니라 학교 계정 발급 API 키 연결입니다.
+[Windows 실행 패키지](https://github.com/tajomania/paju-essay-road/releases/download/v1.2.0/Paju-Essay-Road-Windows.zip)를 내려받아 전체 압축을 풀고 Start-Classroom.cmd를 실행합니다. 별도 Node.js 설치 없이 시작합니다. 내 AI 연결에서 학교 Google 계정으로 AI Studio에 로그인해 발급한 Gemini API 키를 연결합니다. 계정의 AI Studio·프로젝트 권한은 학교 관리자 정책에 따라 제한될 수 있습니다. 이 방식은 Google OAuth 로그인 버튼이 아니라 학교 계정 발급 API 키 연결입니다.
 
 학생은 같은 학교망에서 교사 PC의 참여 링크로 이용합니다. 로컬 기록과 암호화된 키는 교사 PC에 저장하며 공개 서버와 별개입니다. Gemini 분석은 Google API로 전송되므로 인터넷이 필요합니다.
 
@@ -88,3 +88,7 @@ pnpm exec wrangler deploy --dry-run
 첨부 수업안의 1차시 탐색·질문, 2차시 직접 초고·비판적 수정·공유 흐름을 네 화면으로 구성했습니다. 수업안의 외부 서비스 설명을 사실 보증으로 사용하지 않았으며, AI 결과는 오류가 있을 수 있습니다.
 
 공식 기술 문서: [Google Gemini API 키](https://ai.google.dev/gemini-api/docs/api-key), [Cloudflare 정적 자산과 Workers](https://developers.cloudflare.com/workers/static-assets/), [D1](https://developers.cloudflare.com/d1/get-started/), [GitHub Actions 배포](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/).
+
+## 학생 활동 기록 Excel 다운로드
+
+수업 관리의 **활동 기록 Excel 다운로드**를 누르면 `.xlsx` 파일이 저장됩니다. Excel에서 바로 확인·편집할 수 있습니다. 학생 현황, 활동 상세, AI 피드백, 게시글, 댓글, 공통 자료를 시트별로 확인하세요. 교사 메모 열은 자유롭게 작성할 수 있습니다. 긴 글은 셀 선택 후 수식 입력줄에서 확인하거나 행 높이를 늘리세요. 다운로드 파일 편집은 웹앱 기록에 자동 반영되지 않습니다.

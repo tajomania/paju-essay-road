@@ -25,7 +25,7 @@ AI 요청 시 공통 읽기 자료·희망 분야·에세이 초안·사진이 *
 
 ## 로컬 설치
 
-[Windows 패키지](https://github.com/tajomania/paju-essay-road/releases/download/v1.1.4/Paju-Essay-Road-Windows.zip)를 전체 압축 해제하고 **Start-Classroom.cmd**를 실행하세요. 자세한 설치와 학생 학교망 접속 방법은 [로컬 설치 안내](LOCAL_GOOGLE_GUIDE.md)를 따릅니다. 로컬 학생 접속용 학교망 IP 주소는 AI 제공사 연결과 별개이며 계속 필요합니다.
+[Windows 패키지](https://github.com/tajomania/paju-essay-road/releases/download/v1.2.0/Paju-Essay-Road-Windows.zip)를 전체 압축 해제하고 **Start-Classroom.cmd**를 실행하세요. 자세한 설치와 학생 학교망 접속 방법은 [로컬 설치 안내](LOCAL_GOOGLE_GUIDE.md)를 따릅니다. 로컬 학생 접속용 학교망 IP 주소는 AI 제공사 연결과 별개이며 계속 필요합니다.
 
 ## 자료 전송 동의 오류 해결
 

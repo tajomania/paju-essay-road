@@ -600,7 +600,7 @@ async function handle(request, env) {
               c.id,
             )
           : undefined;
-      return json({
+      const record = {
         posts,
         comments,
         students: students.map((st) => ({
@@ -608,8 +608,9 @@ async function handle(request, env) {
           data: JSON.parse(st.data || "{}"),
           feedback: feedback.filter((f) => f.student_id === st.id),
         })),
-        class: { title: c.title, material: JSON.parse(c.material) },
-      });
+        class: { title: c.title, code: c.code, material: JSON.parse(c.material) },
+      };
+      return json(record);
     }
     if (action === "reset" && method === "POST") {
       const b = await body(request);

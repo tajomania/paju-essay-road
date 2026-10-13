@@ -431,14 +431,14 @@ async function handle(request, env) {
         fail(400, "하루 요청 한도는 1~1000으로 설정하세요.");
       if (b.mode === "personal") {
         if (b.consent !== true)
-          fail(400, "선택한 외부 AI로 전송되는 자료 안내를 확인해 주세요.");
+          fail(400, "설정이 저장되지 않았습니다. 자료 전송 동의의 [필수] 체크박스를 선택한 뒤 설정 저장을 눌러 주세요.");
         accountId = required(b.schoolEmail || "", 200).toLowerCase();
         if (!/^[^@\s]+@goedu\.kr$/.test(accountId))
           fail(400, "goedu.kr 학교 Google 이메일을 입력하세요.");
         const token = text(b.token || "", 2000);
         if (token) {
           if (token.length < 20 || /\s/.test(token))
-            fail(400, "Gemini API 키을 확인해 주세요.");
+            fail(400, "Gemini API 키를 확인해 주세요.");
           cipher = await encryptToken(env, s.actor_id, token);
         } else if (
           old?.token_cipher &&
@@ -446,7 +446,7 @@ async function handle(request, env) {
           (old.provider || "cloudflare") === provider
         )
           cipher = old.token_cipher;
-        else fail(400, "새 계정의 Gemini API 키을 입력해 주세요.");
+        else fail(400, "새 계정의 Gemini API 키를 입력해 주세요.");
       }
       await run(
         env.DB,

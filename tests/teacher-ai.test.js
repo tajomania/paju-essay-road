@@ -192,3 +192,14 @@ test("legacy Cloudflare connection is inactive without deleting stored credentia
  assert.equal(r.data.mode,"disabled"); assert.equal(r.data.available,false); assert.equal(r.data.configured,false);
  assert.equal(t.db.prepare("SELECT token_cipher FROM teacher_ai").get().token_cipher,"legacy-encrypted-data"); t.db.close();
 });
+
+test("missing consent blocks key storage with actionable guidance", async () => {
+ const t=setup(), a=await t.teacher();
+ const b={mode:"personal",schoolEmail:"teacher@goedu.kr",token:"test-google-api-key-123456789"};
+ const r=await t.req("/teacher-ai","PUT",b,a.cookie);
+ assert.equal(r.status,400); assert.match(r.data.error,/체크박스/);
+ assert.equal(t.db.prepare("SELECT count(*) n FROM teacher_ai").get().n,0);
+ assert.equal((await t.req("/teacher-ai/test","POST",{},a.cookie)).status,503);
+ assert.equal((await t.req("/teacher-ai","PUT",{...b,consent:true},a.cookie)).data.configured,true);
+ t.db.close();
+});

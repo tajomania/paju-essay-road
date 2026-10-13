@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#174b42" />
+    <meta
+      name="description"
+      content="파주에서 시작하는 진로 글쓰기. 읽고, 질문하고, 직접 쓰고, 함께 나누는 네 단계 에세이 수업."
+    />
+    <title>파주, 텍스트로 걷고 나의 길을 사유하다</title>
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" type="module"></script>
+  </head>
+  <body>
+    <header class="top">
+      <a
+        class="brand"
+        href="/"
+        aria-label="파주, 텍스트로 걷고 나의 길을 사유하다 처음으로"
+        ><span class="brand-icon">R</span
+        ><span class="brand-name"
+          >파주, 텍스트로 걷고 나의 길을 사유하다<small
+            >PAJU · READ / ASK / WRITE / SHARE</small
+          ></span
+        ></a
+      >
+      <div id="account"></div>
+    </header>
+    <main id="app"><p class="loading">글쓰기 여정을 준비하고 있어요…</p></main>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <footer>
+      생각의 주인은 학생입니다. AI는 질문과 피드백으로 함께합니다.<button
+        id="privacy"
+        class="text-button"
+      >
+        이용·개인정보 안내
+      </button>
+    </footer>
+    <dialog id="dialog">
+      <div id="dialog-content"></div>
+      <button id="close-dialog" class="secondary">닫기</button>
+    </dialog>
+  </body>
+</html>

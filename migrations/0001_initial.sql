@@ -1,0 +1,14 @@
+PRAGMA foreign_keys = ON;
+CREATE TABLE teachers (id TEXT PRIMARY KEY, username TEXT NOT NULL UNIQUE, password TEXT NOT NULL, recovery TEXT NOT NULL, created TEXT NOT NULL);
+CREATE TABLE classes (id TEXT PRIMARY KEY, teacher_id TEXT NOT NULL REFERENCES teachers(id) ON DELETE CASCADE, code TEXT NOT NULL UNIQUE, title TEXT NOT NULL, material TEXT NOT NULL DEFAULT '{}', active INTEGER NOT NULL DEFAULT 1, created TEXT NOT NULL);
+CREATE TABLE students (id TEXT PRIMARY KEY, class_id TEXT NOT NULL REFERENCES classes(id) ON DELETE CASCADE, nickname TEXT NOT NULL, password TEXT NOT NULL, created TEXT NOT NULL, UNIQUE(class_id,nickname));
+CREATE TABLE sessions (token TEXT PRIMARY KEY, role TEXT NOT NULL, actor_id TEXT NOT NULL, expires INTEGER NOT NULL);
+CREATE TABLE work (student_id TEXT PRIMARY KEY REFERENCES students(id) ON DELETE CASCADE, data TEXT NOT NULL DEFAULT '{}', updated TEXT NOT NULL);
+CREATE TABLE feedback (id TEXT PRIMARY KEY, student_id TEXT NOT NULL REFERENCES students(id) ON DELETE CASCADE, draft TEXT NOT NULL, content TEXT NOT NULL, created TEXT NOT NULL);
+CREATE TABLE posts (id TEXT PRIMARY KEY, student_id TEXT NOT NULL UNIQUE REFERENCES students(id) ON DELETE CASCADE, class_id TEXT NOT NULL REFERENCES classes(id) ON DELETE CASCADE, title TEXT NOT NULL, body TEXT NOT NULL, reflection TEXT NOT NULL, career TEXT NOT NULL DEFAULT '', hidden INTEGER NOT NULL DEFAULT 0, created TEXT NOT NULL);
+CREATE TABLE comments (id TEXT PRIMARY KEY, post_id TEXT NOT NULL REFERENCES posts(id) ON DELETE CASCADE, student_id TEXT NOT NULL REFERENCES students(id) ON DELETE CASCADE, body TEXT NOT NULL, hidden INTEGER NOT NULL DEFAULT 0, created TEXT NOT NULL);
+CREATE TABLE usage (key TEXT NOT NULL, day TEXT NOT NULL, count INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(key,day));
+CREATE INDEX students_class ON students(class_id);
+CREATE INDEX posts_class ON posts(class_id);
+CREATE INDEX feedback_student ON feedback(student_id);
+CREATE INDEX comments_post ON comments(post_id);

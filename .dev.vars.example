@@ -1,0 +1,3 @@
+OPENAI_API_KEY=replace-with-your-key
+# Optional: restrict creation of new teacher accounts to an invitation code.
+TEACHER_INVITE_CODE=

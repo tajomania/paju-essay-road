@@ -43,6 +43,7 @@ function setup() {
         }
       },
     },
+    AI_ENABLED: "true",
     ASSETS: { fetch: () => new Response("assets") },
     AI_DAILY_LIMIT: "1000",
     CLASS_AI_DAILY_LIMIT: "150",
@@ -368,5 +369,59 @@ test("work validation strips unauthorized fields and rejects oversized text", as
       .status,
     400,
   );
+  t.db.close();
+});
+
+test("AI disabled flag blocks transmission even when a provider is available", async () => {
+  const t = setup(),
+    a = await t.teacher(),
+    c = await t.classroom(a.cookie),
+    s = await t.student(c.code);
+  t.env.AI_ENABLED = "false";
+  let calls = 0;
+  t.env.AI = {
+    run: async () => {
+      calls++;
+      return { response: "must not run" };
+    },
+  };
+  await t.req("/work", "PUT", { draft: "초안", ocrConfirmed: true }, s.cookie);
+  assert.equal(
+    (await t.req("/ai", "POST", { action: "feedback" }, s.cookie)).status,
+    503,
+  );
+  assert.equal((await t.req("/health")).data.ai, false);
+  assert.equal(calls, 0);
+  t.db.close();
+});
+
+test("Cloudflare binding maps photo inputs and returns text without a provider key", async () => {
+  const t = setup(),
+    a = await t.teacher(),
+    c = await t.classroom(a.cookie),
+    s = await t.student(c.code);
+  let sent;
+  t.env.AI = {
+    run: async (model, input) => {
+      sent = input;
+      return {
+        choices: [
+          { message: { content: "사진 속 학생의 글" }, finish_reason: "stop" },
+        ],
+      };
+    },
+  };
+  const image = "data:image/jpeg;base64,YQ==";
+  const r = await t.req(
+    "/ai",
+    "POST",
+    { action: "ocr", images: [image] },
+    s.cookie,
+  );
+  assert.equal(r.status, 200);
+  assert.equal(r.data.text, "사진 속 학생의 글");
+  assert.equal(sent.messages[1].content[1].image_url.url, image);
+  assert.equal(sent.store, false);
+  assert.equal(sent.chat_template_kwargs.enable_thinking, false);
   t.db.close();
 });

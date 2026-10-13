@@ -1,4 +1,10 @@
 # 운영자용 GitHub 배포 안내
+현재 공개 주소: https://paju-essay-road.essay-road.workers.dev
+
+현재 GitHub 저장소: https://github.com/tajomania/paju-essay-road
+
+현재 배포는 AI_ENABLED=false이며, 외부 AI 전송은 승인 대기 상태입니다. Cloudflare 내장 AI 연결 코드와 OpenAI 선택 연결 코드는 준비되어 있지만 아직 실제 AI 분석이 활성화된 것은 아닙니다.
+
 
 배포 운영자만 이 설정을 수행합니다. 다른 교사와 학생은 완성된 웹앱 주소로 접속합니다. 이 문서는 현재 배포 완료를 뜻하지 않으며, 실제 배포 URL은 GitHub Actions/Cloudflare가 성공한 뒤 확인합니다.
 
@@ -6,7 +12,7 @@
 
 - GitHub: 소스 저장소 및 자동 배포
 - Cloudflare: 웹앱 서버와 D1 데이터베이스
-- OpenAI API: 실제 읽기 자료 생성·주제 추천·사진 인식·피드백 (유료 사용량이 발생할 수 있음)
+- AI: Cloudflare Workers AI 내장 연결 또는 선택적으로 OpenAI API. 제공사 이용량 한도와 비용 정책을 확인합니다.
 
 일반 ChatGPT 구독만으로 API 연결이 완료되지는 않습니다. 운영자는 API 키를 서버 비밀값으로 설정합니다. 학생과 수업을 배포받는 교사에게는 키를 요구하지 않습니다.
 
@@ -48,13 +54,18 @@ Cloudflare Account ID를 확인하고, API Token을 만듭니다. 해당 계정�
 
 자동 배포는 검사 → 설정 주입 → D1 마이그레이션 → Worker와 정적 파일 배포 순서입니다. 학생 데이터를 삭제하는 초기화 명령은 실행하지 않습니다.
 
-## 5. 운영자 AI 키 연결
+## 5. 승인 후 AI 연결 활성화
 
-첫 배포 성공 후 Cloudflare의 생성된 Worker → **Settings → Variables and Secrets**에 다음 값을 추가합니다.
+현재 AI_ENABLED=false로 외부 AI 전송이 차단되어 있습니다. 학생의 읽기 자료·관심 분야·초안·사진을 외부 AI에 전송하는 운영 방식이 승인된 후에만 활성화합니다.
+
+Cloudflare 내장 AI를 사용할 때는 wrangler.jsonc에 ai: {binding: "AI"}를 추가하고 vars의 AI_ENABLED를 "true", CLOUDFLARE_AI_MODEL을 "@cf/qwen/qwen3.8-27b"로 설정해 배포합니다. 키 입력은 필요 없지만 Workers AI 사용량과 계정 한도가 적용됩니다.
+
+OpenAI를 사용할 경우 첫 배포 성공 후 Cloudflare의 생성된 Worker → **Settings → Variables and Secrets**에 다음 값을 추가합니다.
 
 | 이름 | 형식 | 설명 |
 |---|---|---|
-| `OPENAI_API_KEY` | Secret | 운영자 OpenAI API 키 |
+| `OPENAI_API_KEY` | Secret, OpenAI 사용 시 | 운영자 OpenAI API 키 |
+| `AI_ENABLED` | 변수 | 승인 이후에만 true |
 | `TEACHER_INVITE_CODE` | Secret, 선택 | 설정하면 교사 가입 시 초대 코드 필요 |
 
 Cloudflare에서 비밀값을 저장하고 새 배포에 적용합니다. 키는 GitHub에 커밋하지 않습니다. `OPENAI_MODEL` 기본값은 `gpt-4.1-mini`이며 운영자의 API 계정에서 사용 가능한 이미지 입력 모델로 조정할 수 있습니다. `store:false` 요청을 사용하지만 제공사의 데이터 처리 정책은 별도로 적용됩니다.

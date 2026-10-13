@@ -148,6 +148,51 @@ const teacher = (s) => {
 };
 
 async function ai(env, instructions, input, max = 1600) {
+  if (env.AI_ENABLED !== "true")
+    fail(503, "AI 연결이 비활성화되어 있습니다. 운영자에게 문의해 주세요.");
+  if (!env.OPENAI_API_KEY && env.AI) {
+    const messages = [{ role: "system", content: instructions }];
+    if (typeof input === "string")
+      messages.push({ role: "user", content: input });
+    else
+      for (const message of input)
+        messages.push({
+          role: message.role,
+          content: message.content.map((part) =>
+            part.type === "input_image"
+              ? { type: "image_url", image_url: { url: part.image_url } }
+              : { type: "text", text: part.text },
+          ),
+        });
+    let result;
+    try {
+      result = await env.AI.run(
+        env.CLOUDFLARE_AI_MODEL || "@cf/qwen/qwen3.8-27b",
+        {
+          messages,
+          max_completion_tokens: max,
+          reasoning_effort: "low",
+          chat_template_kwargs: { enable_thinking: false },
+          store: false,
+        },
+      );
+    } catch {
+      fail(
+        502,
+        "AI 분석을 완료하지 못했습니다. 잠시 후 다시 시도해 주세요. 운영자는 Cloudflare AI의 이용 한도를 확인해 주세요.",
+      );
+    }
+    const choice = result.choices?.[0];
+    const output = (choice?.message?.content || result.response || "")
+      .replace(/<think>[\s\S]*?<\/think>/g, "")
+      .trim();
+    if (!output || choice?.finish_reason === "length")
+      fail(
+        502,
+        "AI 응답이 완성되지 않았습니다. 사진 수나 글의 분량을 줄여 다시 시도해 주세요.",
+      );
+    return output;
+  }
   if (!env.OPENAI_API_KEY)
     fail(
       503,
@@ -187,7 +232,8 @@ async function ai(env, instructions, input, max = 1600) {
   return out;
 }
 async function aiBudget(env, s, classId) {
-  if (!env.OPENAI_API_KEY) fail(503, "운영자의 AI 연결 설정이 필요합니다.");
+  if (env.AI_ENABLED !== "true" || (!env.OPENAI_API_KEY && !env.AI))
+    fail(503, "운영자의 AI 연결 설정이 필요합니다.");
   await budget(env.DB, `ai:${s.actor_id}`, s.role === "student" ? 12 : 30);
   await budget(
     env.DB,
@@ -249,7 +295,11 @@ async function handle(request, env) {
     !request.headers.get("Content-Type")?.startsWith("application/json")
   )
     fail(415, "JSON 요청만 허용됩니다.");
-  if (p === "/api/health") return json({ ok: true, ai: !!env.OPENAI_API_KEY });
+  if (p === "/api/health")
+    return json({
+      ok: true,
+      ai: !!(env.AI_ENABLED === "true" && (env.OPENAI_API_KEY || env.AI)),
+    });
   if (p.startsWith("/api/auth/") && method === "POST") {
     await budget(
       env.DB,
@@ -384,7 +434,7 @@ async function handle(request, env) {
           "SELECT id,code,title,active,created FROM classes WHERE teacher_id=? ORDER BY created DESC",
           s.actor_id,
         ),
-        ai: !!env.OPENAI_API_KEY,
+        ai: !!(env.AI_ENABLED === "true" && (env.OPENAI_API_KEY || env.AI)),
       });
     const st = await student(env, s),
       c = await classroom(env, s, st.class_id);
@@ -392,7 +442,7 @@ async function handle(request, env) {
       role: s.role,
       nickname: st.nickname,
       class: { ...c, teacher_id: undefined, material: JSON.parse(c.material) },
-      ai: !!env.OPENAI_API_KEY,
+      ai: !!(env.AI_ENABLED === "true" && (env.OPENAI_API_KEY || env.AI)),
     });
   }
   if (p === "/api/classes" && method === "POST") {

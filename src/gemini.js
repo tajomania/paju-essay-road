@@ -2,13 +2,20 @@ const fail = (status, message) => {
   throw Object.assign(new Error(message), { status });
 };
 // Never return Google response text: it can include project IDs and credentials.
-async function handleGoogleError(response) {
+async function handleGoogleError(response, diagnosticToken = "") {
   let data;
   try { data = await response.json(); } catch { data = {}; }
   const error = data.error || {};
   const reasons = (error.details || []).map(d => d.reason || "");
   const message = String(error.message || "").toLowerCase();
   const tag = `Google HTTP ${response.status}`;
+  if (reasons.includes("API_KEY_EXPIRED") || /api key.*expired|expired.*api key/.test(message))
+    fail(502, `[${tag} · KEY_EXPIRED] Google에서 저장한 API 키가 만료됐다고 응답했습니다. 학교 계정의 AI Studio에서 새 Gemini API 키를 발급한 뒤 내 AI 연결에 다시 저장하세요.`);
+  if (/user location is not supported|location.*not supported|unsupported.*region/.test(message))
+    fail(502, `[${tag} · REGION_UNSUPPORTED] Google이 웹앱 서버의 접속 지역을 지원하지 않는다고 응답했습니다. 교사의 계정·키 오류와 별개로 서버 실행 지역 확인이 필요합니다.`);
+  if (/api key.*must.*restrict|unrestricted.*key/.test(message))
+    fail(502, `[${tag} · KEY_RESTRICTION] Google이 제한 설정이 없는 API 키를 거절했습니다. AI Studio에서 현재 발급하는 Gemini 전용 키를 사용하고 프로젝트 관리자에게 키의 API 제한을 확인하세요.`);
+
   if (reasons.includes("API_KEY_INVALID") || /api key not valid|invalid api key|api_key_invalid/.test(message))
     fail(502, `[${tag} · KEY_INVALID] API 키가 유효하지 않습니다. 학교 계정의 Google AI Studio에서 Gemini API 키를 새로 발급해 저장하세요. Google 로그인 비밀번호나 다른 서비스용 키는 사용할 수 없습니다.`);
   if (/reported as leaked|leaked/.test(message))
@@ -25,8 +32,20 @@ async function handleGoogleError(response) {
     fail(502, `[${tag} · PERMISSION] API 키의 프로젝트 권한, 키 제한과 학교 관리자 정책을 확인하세요.`);
   if (response.status === 404)
     fail(502, `[${tag} · MODEL_NOT_FOUND] 저장한 모델을 사용할 수 없습니다. 모델 이름과 계정에서 제공하는 모델을 확인하세요.`);
-  if (response.status === 400)
-    fail(502, `[${tag} · INVALID_REQUEST] Google이 요청을 거절했습니다. Gemini API 키와 모델 이름을 확인하세요. 무료 이용·프로젝트 설정도 AI Studio에서 확인할 수 있습니다.`);
+  if (response.status === 400) {
+    // Only the teacher's fixed-text connection test may expose redacted detail.
+    // Student analysis never returns raw provider messages.
+    let detail = "";
+    if (diagnosticToken) {
+      detail = String(error.message || "").split(diagnosticToken).join("[API 키 숨김]")
+        .replace(/AIza[A-Za-z0-9_-]+/g, "[API 키 숨김]")
+        .replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, "[이메일 숨김]")
+        .replace(/projects\/[A-Za-z0-9_-]+/g, "projects/[숨김]")
+        .replace(/project(?:_id| number)?[ :=]+["']?[a-z0-9_-]+/gi, "project [숨김]")
+        .replace(/[\x00-\x1f]/g, " ").slice(0, 450);
+    }
+    fail(502, `[${tag} · INVALID_REQUEST] Google이 요청을 거절했습니다.${detail ? " Google 진단: " + detail : " 교사의 연결 테스트에서 구체적인 원인을 확인하세요."}`);
+  }
   if ([408, 500, 502, 503, 504].includes(response.status))
     fail(503, `[${tag} · TEMPORARY_UNAVAILABLE] Google 서비스의 일시적인 오류입니다. 자동 재시도 후에도 응답하지 않았습니다. API 키를 다시 발급하지 말고 잠시 후 연결 테스트를 실행하세요.`);
   fail(502, `[${tag} · PROVIDER_ERROR] Google API가 요청을 처리하지 못했습니다. 잠시 후 다시 시도하세요.`);
@@ -63,8 +82,8 @@ export async function runGemini(token, model, input) {
           "x-goog-api-key": token,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: system }] },
+        body: JSON.stringify(input.connection_test ? { contents } : {
+          ...(system ? {systemInstruction: { parts: [{ text: system }] }} : {}),
           contents,
           generationConfig: {
             maxOutputTokens: (input.max_completion_tokens || 1600) + 2048,
@@ -80,7 +99,7 @@ export async function runGemini(token, model, input) {
     }
   } catch (error) {
     if (response && [408, 500, 502, 503, 504].includes(response.status))
-      await handleGoogleError(response);
+      await handleGoogleError(response, input.connection_test ? token : "");
     if (error?.name === "TimeoutError" || error?.name === "AbortError")
       fail(504, "[GOOGLE_TIMEOUT] Google 서버의 응답이 지연되고 있습니다. 잠시 후 연결 테스트를 다시 실행하세요.");
     if (/CERT|TLS|SELF_SIGNED|UNABLE_TO_VERIFY/.test(error?.cause?.code || ""))
@@ -90,7 +109,7 @@ export async function runGemini(token, model, input) {
       "Google Gemini에 연결하지 못했습니다. 교사 컴퓨터의 인터넷 연결을 확인하세요.",
     );
   }
-  if (!response.ok) await handleGoogleError(response);
+  if (!response.ok) await handleGoogleError(response, input.connection_test ? token : "");
   const result = await response.json(),
     candidate = result.candidates?.[0];
   const content = (candidate?.content?.parts || [])

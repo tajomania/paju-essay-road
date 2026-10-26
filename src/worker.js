@@ -4,6 +4,7 @@ import {
   settings as aiSettings,
   status as aiStatus,
   aiEnvironment,
+  testTeacherConnection,
 } from "./teacher-ai.js";
 const enc = new TextEncoder();
 const now = () => new Date().toISOString();
@@ -464,15 +465,7 @@ async function handle(request, env) {
     }
     if (p === "/api/teacher-ai/test" && method === "POST") {
       await budget(env.DB, `ai-test:${s.actor_id}`, 8);
-      const provider = await aiEnvironment(env, s.actor_id);
-      if (!aiStatus(env, old).available)
-        fail(503, "사용 가능한 AI 연결을 먼저 설정해 주세요.");
-      const result = await ai(
-        provider,
-        "한국어로 연결 확인이라는 두 단어만 답한다.",
-        "연결을 확인해 주세요.",
-        60,
-      );
+      const result = await testTeacherConnection(env, s.actor_id);
       return json({
         ok: true,
         message: "AI 연결 테스트에 성공했습니다.",

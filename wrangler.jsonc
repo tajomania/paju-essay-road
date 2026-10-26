@@ -3,6 +3,9 @@
   "name": "paju-essay-road",
   "main": "src/worker.js",
   "compatibility_date": "2026-10-01",
+  "placement": {
+    "region": "gcp:asia-northeast3",
+  },
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",

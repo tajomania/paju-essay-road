@@ -25,3 +25,19 @@ test("connection test has a shorter timeout and an explicit timeout diagnosis",a
  globalThis.fetch=async(_url,init)=>{assert.ok(init.signal);throw Object.assign(new Error("timeout"),{name:"TimeoutError"})};
  try{await assert.rejects(runGemini("test-key","gemini-3.1-flash-lite",input),e=>e.status===504&&e.message.includes("GOOGLE_TIMEOUT"));}finally{globalThis.fetch=original;}
 });
+
+test("connection probe sends minimal content and reports expired keys and region rejection",async()=>{
+ const original=globalThis.fetch;
+ try{for(const [message,expected] of [["API key expired. Please renew the API key.","KEY_EXPIRED"],["User location is not supported for the API use.","REGION_UNSUPPORTED"]]) {
+ globalThis.fetch=async(_url,init)=>{const b=JSON.parse(init.body);assert.deepEqual(Object.keys(b),["contents"]);return Response.json({error:{message}},{status:400})};
+ await assert.rejects(runGemini("secret-token","gemini-3.1-flash-lite",{...input,connection_test:true}),e=>e.message.includes(expected));
+ }}finally{globalThis.fetch=original;}
+});
+test("only teacher connection probes return redacted diagnostics for otherwise unknown 400",async()=>{
+ const original=globalThis.fetch;
+ globalThis.fetch=async()=>Response.json({error:{message:"Unknown parameter; token secret-token; projects/private-id; teacher@goedu.kr"}},{status:400});
+ try{
+ await assert.rejects(runGemini("secret-token","gemini-3.1-flash-lite",{...input,connection_test:true}),e=>e.message.includes("Unknown parameter")&&!/secret-token|private-id|teacher@goedu.kr/.test(e.message));
+ await assert.rejects(runGemini("secret-token","gemini-3.1-flash-lite",input),e=>!e.message.includes("Unknown parameter"));
+ }finally{globalThis.fetch=original;}
+});

@@ -76,3 +76,18 @@ export async function aiEnvironment(env, teacherId) {
     AI: { run: (_model, input) => runGemini(token, row.model || "gemini-3.1-flash-lite", input) },
   };
 }
+
+export async function testTeacherConnection(env, teacherId) {
+  const row = await settings(env, teacherId);
+  if (!status(env, row).available) fail(503, "사용 가능한 AI 연결을 먼저 설정해 주세요.");
+  const token = await decryptToken(env, teacherId, row.token_cipher);
+  const result = await runGemini(token, row.model || "gemini-3.1-flash-lite", {
+    messages: [{ role: "user", content: "한국어로 연결 확인이라고만 답하세요." }],
+    max_completion_tokens: 60,
+    connection_test: true,
+  });
+  const choice = result.choices?.[0];
+  if (!choice?.message?.content || choice.finish_reason === "length")
+    fail(502, "Google 연결은 됐지만 테스트 답변이 완료되지 않았습니다. 다시 실행해 주세요.");
+  return choice.message.content;
+}

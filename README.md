@@ -1,3 +1,9 @@
+## 웹 수업 사용
+
+교사와 학생의 공통 주소: https://paju-essay-road.essay-road.workers.dev/
+
+교사는 웹에서 가입·로그인하고 수업 방을 만듭니다. 학생은 같은 주소에서 8자리 수업 코드를 입력한 뒤 수업용 별명·비밀번호로 참여합니다. 교사 PC의 설치·상시 실행·같은 학교망 연결은 필요하지 않습니다. 기존 PC 설치 버전의 기록은 자동 이전되지 않습니다. [웹 사용 안내](https://paju-essay-road.essay-road.workers.dev/classroom-guide.html)
+
 # 파주, 텍스트로 걷고 나의 길을 사유하다
 현재 공개 주소: https://paju-essay-road.essay-road.workers.dev
 
